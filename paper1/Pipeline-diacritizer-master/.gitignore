@@ -1,0 +1,12 @@
+# LaTeX
+*.out
+*.log
+*.bbl
+*.aux
+*.synctex.gz
+*.blg
+*.pdf
+# IntellijIDEA
+.idea/
+# Python
+__pycache__/
