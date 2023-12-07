@@ -28,6 +28,7 @@ NUMBER_REGEXP = re.compile(r'\d+(?:\.\d+)?')
 ZERO_REGEXP = re.compile(r'\b0\b')
 WORD_TOKENIZATION_REGEXP = re.compile(
     '((?:[' + ''.join(ARABIC_LETTERS) + ']['+''.join(ARABIC_DIACRITICS)+r']*)+|\d+(?:\.\d+)?)')
+print("WORD_TOKENIZATION_REGEXP: ", WORD_TOKENIZATION_REGEXP)
 SENTENCE_TOKENIZATION_REGEXP = re.compile(r'([' + SENTENCE_SEPARATORS + r'])(?!\w)|' + XML_TAG)
 CHAR2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_LETTERS)))
 CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0'], len(CHAR2INDEX))))
