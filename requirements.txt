@@ -1,0 +1,8 @@
+pip install --upgrade pip
+conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c conda-forge
+pip install gensim
+pip install nltk
+pip install tokenizers
+pip install sentencepiece
+pip install python-bidi
+pip install arabic-reshaper
