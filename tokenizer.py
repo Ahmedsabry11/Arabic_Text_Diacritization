@@ -5,7 +5,7 @@ from pyarabic.araby import tokenize, strip_tashkeel
 
 
 class Tokenizer:
-    def __init__(self,tokenizer_type, model_file,load = True):
+    def __init__(self,tokenizer_type, model_file="",load = True):
         self.model_file = model_file
         self.tokenizer = None
         self.tokenizer_type = tokenizer_type
@@ -103,6 +103,13 @@ class Tokenizer:
                 # append only words
                 sentence_words.append(decoded_word)
             return sentence_words
+        elif self.tokenizer_type == "pyarabic":
+            # use pyarabic tokenizer
+            # tokenize the sentence
+            tokens = tokenize(sentence)
+            # remove tashkeel
+            # tokens = strip_tashkeel(tokens)
+            return tokens
         else:
             print("Error: Invalid tokenizer type")
             exit()
@@ -112,6 +119,7 @@ class Tokenizer:
         for sentence in sentences:
             tokenized_sentences.append(self.tokenize(sentence))
         return tokenized_sentences
+    
 # from tokenizers import ByteLevelBPETokenizer
 # import textProcessing as tp
 

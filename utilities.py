@@ -1,6 +1,16 @@
 import sentencepiece as spm
 from tokenizers import ByteLevelBPETokenizer
 
+def load_text(file_path):
+    # read text file sentence by sentence
+    sentences = []
+    with open(file_path,'rt', encoding='utf-8') as f:
+        text_line = f.readline().strip()
+        # train_text.append(train_text_line)
+        while(text_line != ""):
+            sentences.append(text_line)
+            text_line = f.readline().strip()
+    return sentences
 def create_tokenized_sentence(file_path,model_file):
     # read text file sentence by sentence
     sentences = []

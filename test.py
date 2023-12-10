@@ -1,8 +1,26 @@
 import textProcessing as tp
 import nltk
+from tokenizer import Tokenizer
+
+# train_text, test_text = tp.loadText()
+# filtered_sentences = tp.preprocessing_text(train_text,"train_preprocessed.txt")
+
+sentences = []
+with open('dataset/undiacritized_train_preprocessed.txt','rt', encoding='utf-8') as f:
+    text_line = f.readline().strip()
+    # train_text.append(train_text_line)
+    while(text_line != ""):
+        sentences.append(text_line)
+        text_line = f.readline().strip()
+
+# load undiacritized train text
+
+# create tokenizer
+tokenizer = Tokenizer("pyarabic")
+tokenized_sentences = tokenizer.tokenize_sentences(sentences)
+print("tokenized_sentences: ",tokenized_sentences[:10])
 
 
-train_text, test_text = tp.loadText()
 # print(len(train_text))
 
 # line = train_text[1]
@@ -24,5 +42,4 @@ train_text, test_text = tp.loadText()
 # for t in sentences:
 #     print("t: ", t)
 
-tp.preprocessing_text(train_text,"train_preprocessed.txt")
-tp.preprocessing_text(test_text,"test_preprocessed.txt")
+# tp.preprocessing_text(test_text,"test_preprocessed.txt")
