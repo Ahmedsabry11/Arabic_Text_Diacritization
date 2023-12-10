@@ -6,3 +6,4 @@ pip install tokenizers
 pip install sentencepiece
 pip install python-bidi
 pip install arabic-reshaper
+pip install PyArabic
