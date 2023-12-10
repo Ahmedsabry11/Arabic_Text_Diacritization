@@ -107,7 +107,11 @@ class Tokenizer:
             print("Error: Invalid tokenizer type")
             exit()
 
-
+    def tokenize_sentences(self, sentences):
+        tokenized_sentences = []
+        for sentence in sentences:
+            tokenized_sentences.append(self.tokenize(sentence))
+        return tokenized_sentences
 # from tokenizers import ByteLevelBPETokenizer
 # import textProcessing as tp
 
