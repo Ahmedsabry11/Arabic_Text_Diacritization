@@ -97,12 +97,16 @@ def remove_non_arabic(text):
 def extract_diacritics(text):
     assert isinstance(text, str)
     diacritics_list = []
+    # split text to words on spaces
+    words = text.split()
+    # join words to one string
+    text = ' '.join(words)
     for i in range(len(text)):
         # check if the character is a diacritic
         if text[i] in ARABIC_DIACRITICS:
             diacritics_list.append(text[i])
         # check if the character is a letter and the previous character is a letter so there is no diacritic
-        elif text[i-1] in ARABIC_LETTERS:
+        elif i!=0 and text[i-1] in ARABIC_LETTERS:
             diacritics_list.append('')
     # check if the last character is a letter so there is no diacritic
     if text[-1] in ARABIC_LETTERS:
@@ -128,6 +132,37 @@ def extract_diacritics_with_shadda(text):
         diacritics_list.append('')
     return diacritics_list
 
+def extract_diacritics_with_previous_letter(text):
+    assert isinstance(text, str)
+    diacritics_list = []
+    i = 0
+    while i <len(text):
+        # check if the character is a arabic letter
+        if text[i] in ARABIC_LETTERS:
+            # check if next character is diacritic not shadda
+            if i+1 < len(text):
+                if text[i+1] in ARABIC_DIACRITICS - {NAME2DIACRITIC['Shadda']}:
+                    diacritics_list.append([text[i], text[i+1]])
+                    i += 1
+                elif text[i+1] == NAME2DIACRITIC['Shadda'] and i+2< len(text) and \
+                      text[i+2] in ARABIC_DIACRITICS - {NAME2DIACRITIC['Shadda']} :
+                    diacritics_list.append([text[i], text[i+1], text[i+2]])
+                    i += 1
+                elif text[i+1] == NAME2DIACRITIC['Shadda']:
+                    diacritics_list.append([text[i], text[i+1]])
+                    i += 1
+                else:
+                    diacritics_list.append([text[i], ''])
+                i+=1    
+            else:
+                diacritics_list.append([text[i], ''])
+                i+=1
+        else:
+            i+=1
+    return diacritics_list
+
+
+                
 
 def merge_text_with_diacritics(undiacritized_text, diacritics):
 
@@ -150,6 +185,104 @@ def merge_text_with_diacritics(undiacritized_text, diacritics):
                 j += 1
         j += 1
     return ''.join(sequence)
+
+def merge_tokenized_with_diacritics(tokenized_sentence, diacritics):
+    assert isinstance(tokenized_sentence, list) and all(isinstance(w, str) for w in tokenized_sentence)
+    # assert set(diacritics).issubset(ARABIC_DIACRITICS.union(['']))
+    
+    # diacritics is list of diacritics for sentence
+    # tokenized_sentence is list of words in sentence
+    # merge diacritics with words
+    i = 0
+    j = 0
+    sequence = []
+    while i < len(tokenized_sentence) and j < len(diacritics):
+        # loop on each word in sentence
+        word = tokenized_sentence[i]
+        # loop on each character in word
+        for char in word:
+            sequence.append(char)
+
+            if j < len(diacritics) and  diacritics[j] in ARABIC_DIACRITICS:
+                sequence.append(diacritics[j])
+                # check if the diacritic is shadda and the next diacritic is not shadda
+                if DIACRITIC2NAME[diacritics[j]] == 'Shadda' and j+1 < len(diacritics) and \
+                        diacritics[j+1] in ARABIC_DIACRITICS - {diacritics[j]}:
+                    sequence.append(diacritics[j+1])
+                    j += 1
+            j += 1
+        i += 1
+        # add space after each word
+        sequence.append(' ')
+    return ''.join(sequence)
+def merge_tokenized_with_diacritics2(tokenized_sentence, diacritics):
+    assert isinstance(tokenized_sentence, list) and all(isinstance(w, str) for w in tokenized_sentence)
+    # assert set(diacritics).issubset(ARABIC_DIACRITICS.union(['']))
+    
+    # diacritics is list of diacritics for sentence
+    # tokenized_sentence is list of words in sentence
+    # merge diacritics with words
+    i = 0
+    j = 0
+    sequence = []
+    while i < len(tokenized_sentence) and j < len(diacritics):
+        # loop on each word in sentence
+        word = tokenized_sentence[i]
+        # loop on each character in word
+        for char in word:
+            sequence.append(char)
+
+            if j < len(diacritics) and  diacritics[j] in ARABIC_DIACRITICS:
+                sequence.append(diacritics[j])
+                # check if the diacritic is shadda and the next diacritic is not shadda
+                if DIACRITIC2NAME[diacritics[j]] == 'Shadda' and j+1 < len(diacritics) and \
+                        diacritics[j+1] in ARABIC_DIACRITICS - {diacritics[j]}:
+                    sequence.append(diacritics[j+1])
+                    j += 1
+            # check if diacritics[j] is tuple of shadda and diacritic
+            elif j < len(diacritics) and isinstance(diacritics[j], tuple):
+                sequence.append(diacritics[j][0])
+                sequence.append(diacritics[j][1])
+                j += 1
+            j += 1
+        i += 1
+        # add space after each word
+        sequence.append(' ')
+    return ''.join(sequence)
+
+def merge_tokenized_with_diacritics3(tokenized_sentence, diacritics):
+    assert isinstance(tokenized_sentence, list) and all(isinstance(w, str) for w in tokenized_sentence)
+    # assert set(diacritics).issubset(ARABIC_DIACRITICS.union(['']))
+    
+    # diacritics is list of diacritics for sentence
+    # tokenized_sentence is list of words in sentence
+    # merge diacritics with words
+    i = 0
+    j = 0
+    sequence = []
+    while i < len(tokenized_sentence) and j < len(diacritics):
+        # loop on each word in sentence
+        word = tokenized_sentence[i]
+        # loop on each character in word
+        for char in word:
+            sequence.append(char)
+            # check char is equal to diacritics[j][0]
+            if char != diacritics[j][0]:
+                print("Error: char is not equal to diacritics[j][0]")
+                print("char: ",char)
+                print("diacritics[j][0]: ",diacritics[j][0])
+                exit()
+            
+            for diacritic_index in range(1,len(diacritics[j])):
+                sequence.append(diacritics[j][diacritic_index])
+            j += 1
+            
+        i += 1
+        # add space after each word
+        sequence.append(' ')
+    return ''.join(sequence)
+
+
 
 def clean_text(text):
 

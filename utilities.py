@@ -1,5 +1,6 @@
 import sentencepiece as spm
 from tokenizers import ByteLevelBPETokenizer
+import textProcessing as tp
 
 def load_text(file_path):
     # read text file sentence by sentence
@@ -11,6 +12,17 @@ def load_text(file_path):
             sentences.append(text_line)
             text_line = f.readline().strip()
     return sentences
+
+def extract_labels(sentences):
+    labels = []
+    for sentence in sentences:
+        # extract diacritics
+        diacritics = tp.extract_diacritics_with_previous_letter(sentence)
+        # append diacritics to labels
+        labels.append(diacritics)
+    return labels
+
+
 def create_tokenized_sentence(file_path,model_file):
     # read text file sentence by sentence
     sentences = []
