@@ -10,8 +10,6 @@ import os
 import numpy as np
 import pandas as pd
 
-nltk.download('punkt')
-
 # define constants
 DIACRITIC_NAMES = ['Fathatan', 'Dammatan', 'Kasratan', 'Fatha', 'Damma', 'Kasra', 'Shadda', 'Sukun']
 NAME2DIACRITIC = dict((name, chr(code)) for name, code in zip(DIACRITIC_NAMES, range(0x064B, 0x0653)))
@@ -42,6 +40,9 @@ SENTENCE_TOKENIZATION_REGEXP = re.compile(r'([' + SENTENCE_SEPARATORS + r'])(?!\
 CHAR2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_LETTERS)))
 CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0'], len(CHAR2INDEX))))
 INDEX2CHAR = dict((v, k) for k, v in CHAR2INDEX.items())
+DIACRITIC2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_DIACRITICS)))
+DIACRITIC2INDEX.update(dict((v, k) for k, v in enumerate([''], len(DIACRITIC2INDEX))))
+INDEX2DIACRITIC = dict((v, k) for k, v in DIACRITIC2INDEX.items())
 
 # print arabic diacritics
 def printDiacritics():
@@ -70,29 +71,20 @@ def loadText():
 
 
 # print arabic text
-def printFirstLine(text):
+def printFirstLine(line):
     # print first line of arabic text correctly
-    line = text[0]
-    print(line)
-    # extract arabic letters only with diacritics amd spaces
-    line = re.sub(r'[^ء-ي\s]', '', line)
-
-    print(line)
     # reshape arabic letters
-    line = arabic_reshaper.reshape(line)
-    print(line)
+    # line = arabic_reshaper.reshape(line)
     # print arabic letters correctly
+    # print(line)
     line = get_display(line)
+    # line = arabic_reshaper.reshape(line)
     print(line)
 
 
 def clear_diacritics(text):
     assert isinstance(text, str)
     return ''.join([l for l in text if l not in ARABIC_DIACRITICS])
-
-def remove_non_arabic(text):
-    assert isinstance(text, str)
-    return ''.join([l for l in text if l in ARABIC_LETTERS])
 
 def extract_diacritics(text):
     assert isinstance(text, str)
@@ -157,6 +149,9 @@ def extract_diacritics_with_previous_letter(text):
             else:
                 diacritics_list.append([text[i], ''])
                 i+=1
+        # elif text[i] is ' ':
+        #     diacritics_list.append([' ', ''])
+        #     i+=1
         else:
             i+=1
     return diacritics_list
@@ -358,6 +353,8 @@ def remove_non_arabic_chars(text):
     assert isinstance(text, str)
     # using regex
     line = re.sub(ARABIC_DIACRITICS_REGEXP,'',text)
+    # remove more than 2 space between words
+    line = re.sub(' +', ' ', line)
     return line
 
 def preprocessing_text(text,name,debug = False):

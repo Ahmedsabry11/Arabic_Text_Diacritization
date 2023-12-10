@@ -1,6 +1,7 @@
 import sentencepiece as spm
 from tokenizers import ByteLevelBPETokenizer
 import textProcessing as tp
+import numpy as np
 
 def load_text(file_path):
     # read text file sentence by sentence
@@ -74,6 +75,49 @@ def create_tokenized_sentence2(file_path,model_file):
     # print(sentences[:10])
     return encoded_sentences
 
-create_tokenized_sentence2("dataset/undiacritized_train_preprocessed.txt","arabic_bpe_tokenizer.json")
+"""
+    input is 2d array of sentences
+
+    each sentence is an array of words
+
+    each word is an array of characters
+
+    each character is vector of 1s and 0s or embedding with dim 300
+
+    get_item should return a sentence as a 2d array of characters
+
+"""
+def convert_char_to_vector(char):
+    # convert each character to vector of 1s and 0s
+    # get character index from dictionary
+    index = tp.CHAR2INDEX[char]
+    # create vector of zeros
+    vector = [0] * len(tp.CHAR2INDEX)
+    # set index to 1
+    vector[index] = 1
+    return np.array(vector)
+
+def convert_diacritic_to_vector(diacritic):
+    # convert each diacritic to vector of 1s and 0s
+    # get diacritic index from dictionary
+
+    index = tp.DIACRITIC2INDEX[diacritic]
+    # create vector of zeros
+    vector = [0] * len(tp.DIACRITIC2INDEX)
+    # set index to 1
+    vector[index] = 1
+    return np.array(vector)
+
+def convert_sentence_to_vector(tokenzied_sentence):
+    # convert each character to vector of 1s and 0s
+    # get character index from dictionary
+    sentence_vector = []
+    for word in tokenzied_sentence:
+        for char in word:
+            char_vec = convert_char_to_vector(char)
+            sentence_vector.append(char_vec)
+    return np.array(sentence_vector)
+
+# create_tokenized_sentence2("dataset/undiacritized_train_preprocessed.txt","arabic_bpe_tokenizer.json")
 # create_tokenized_sentence("dataset/undiacritized_train_preprocessed.txt","arabic_tokenizer.model")
     
