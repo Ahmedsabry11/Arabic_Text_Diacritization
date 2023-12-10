@@ -13,6 +13,14 @@ import pandas as pd
 # define constants
 DIACRITIC_NAMES = ['Fathatan', 'Dammatan', 'Kasratan', 'Fatha', 'Damma', 'Kasra', 'Shadda', 'Sukun']
 NAME2DIACRITIC = dict((name, chr(code)) for name, code in zip(DIACRITIC_NAMES, range(0x064B, 0x0653)))
+# append shadda to diacritics
+NAME2DIACRITIC['Shadda_Dammatan'] = NAME2DIACRITIC['Shadda'] + NAME2DIACRITIC['Dammatan']
+NAME2DIACRITIC['Shadda_Kasratan'] = NAME2DIACRITIC['Shadda'] + NAME2DIACRITIC['Kasratan']
+NAME2DIACRITIC['Shadda_Fatha'] = NAME2DIACRITIC['Shadda'] + NAME2DIACRITIC['Fatha']
+NAME2DIACRITIC['Shadda_Damma'] = NAME2DIACRITIC['Shadda'] + NAME2DIACRITIC['Damma']
+NAME2DIACRITIC['Shadda_Kasra'] = NAME2DIACRITIC['Shadda'] + NAME2DIACRITIC['Kasra']
+NAME2DIACRITIC['Shadda_Fathatan'] = NAME2DIACRITIC['Shadda'] + NAME2DIACRITIC['Fathatan']
+
 DIACRITIC2NAME = dict((code, name) for name, code in NAME2DIACRITIC.items())
 ARABIC_DIACRITICS = frozenset(NAME2DIACRITIC.values())
 ARABIC_LETTERS = frozenset([chr(x) for x in (list(range(0x0621, 0x63B)) + list(range(0x0641, 0x064B)))])
@@ -40,9 +48,11 @@ SENTENCE_TOKENIZATION_REGEXP = re.compile(r'([' + SENTENCE_SEPARATORS + r'])(?!\
 CHAR2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_LETTERS)))
 CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0'], len(CHAR2INDEX))))
 INDEX2CHAR = dict((v, k) for k, v in CHAR2INDEX.items())
+
 DIACRITIC2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_DIACRITICS)))
 DIACRITIC2INDEX.update(dict((v, k) for k, v in enumerate([''], len(DIACRITIC2INDEX))))
 INDEX2DIACRITIC = dict((v, k) for k, v in DIACRITIC2INDEX.items())
+
 
 # print arabic diacritics
 def printDiacritics():
@@ -138,7 +148,7 @@ def extract_diacritics_with_previous_letter(text):
                     i += 1
                 elif text[i+1] == NAME2DIACRITIC['Shadda'] and i+2< len(text) and \
                       text[i+2] in ARABIC_DIACRITICS - {NAME2DIACRITIC['Shadda']} :
-                    diacritics_list.append([text[i], text[i+1], text[i+2]])
+                    diacritics_list.append([text[i], text[i+1]+text[i+2]])
                     i += 1
                 elif text[i+1] == NAME2DIACRITIC['Shadda']:
                     diacritics_list.append([text[i], text[i+1]])
@@ -149,9 +159,9 @@ def extract_diacritics_with_previous_letter(text):
             else:
                 diacritics_list.append([text[i], ''])
                 i+=1
-        # elif text[i] is ' ':
-        #     diacritics_list.append([' ', ''])
-        #     i+=1
+        elif text[i] == ' ':
+            diacritics_list.append([' ', ''])
+            i+=1
         else:
             i+=1
     return diacritics_list

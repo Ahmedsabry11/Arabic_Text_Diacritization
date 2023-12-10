@@ -108,7 +108,16 @@ def convert_diacritic_to_vector(diacritic):
     vector[index] = 1
     return np.array(vector)
 
-def convert_sentence_to_vector(tokenzied_sentence):
+def convert_labels_to_vector(labels):
+    # convert each character to vector of 1s and 0s
+    # get character index from dictionary
+    labels_vector = []
+    for label in labels:
+        label_vec = convert_diacritic_to_vector(label[1])
+        labels_vector.append(label_vec)
+    return np.array(labels_vector)
+
+def convert_tokenized_sentence_to_vector(tokenzied_sentence):
     # convert each character to vector of 1s and 0s
     # get character index from dictionary
     sentence_vector = []
@@ -116,6 +125,14 @@ def convert_sentence_to_vector(tokenzied_sentence):
         for char in word:
             char_vec = convert_char_to_vector(char)
             sentence_vector.append(char_vec)
+    return np.array(sentence_vector)
+def convert_sentence_to_vector(sentence):
+    # convert each character to vector of 1s and 0s
+    # get character index from dictionary
+    sentence_vector = []
+    for char in sentence:
+        char_vec = convert_char_to_vector(char)
+        sentence_vector.append(char_vec)
     return np.array(sentence_vector)
 
 # create_tokenized_sentence2("dataset/undiacritized_train_preprocessed.txt","arabic_bpe_tokenizer.json")
