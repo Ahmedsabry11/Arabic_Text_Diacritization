@@ -45,6 +45,8 @@ ZERO_REGEXP = re.compile(r'\b0\b')
 WORD_TOKENIZATION_REGEXP = re.compile(
     '((?:[' + ''.join(ARABIC_LETTERS) + ']['+''.join(ARABIC_DIACRITICS)+r']*)+|\d+(?:\.\d+)?)')
 SENTENCE_TOKENIZATION_REGEXP = re.compile(r'([' + SENTENCE_SEPARATORS + r'])(?!\w)|' + XML_TAG)
+SENTENCE_DOT = re.compile(r'([.])(?!\w)|' + XML_TAG)
+
 CHAR2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_LETTERS)))
 CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0'], len(CHAR2INDEX))))
 INDEX2CHAR = dict((v, k) for k, v in CHAR2INDEX.items())
@@ -138,10 +140,13 @@ def extract_diacritics_with_previous_letter(text):
     assert isinstance(text, str)
     diacritics_list = []
     i = 0
+    sentence = ''
     while i <len(text):
         # check if the character is a arabic letter
         if text[i] in ARABIC_LETTERS:
             # check if next character is diacritic not shadda
+            # add arabic letter to sentence
+            sentence += text[i]
             if i+1 < len(text):
                 if text[i+1] in ARABIC_DIACRITICS - {NAME2DIACRITIC['Shadda']}:
                     diacritics_list.append([text[i], text[i+1]])
@@ -149,7 +154,7 @@ def extract_diacritics_with_previous_letter(text):
                 elif text[i+1] == NAME2DIACRITIC['Shadda'] and i+2< len(text) and \
                       text[i+2] in ARABIC_DIACRITICS - {NAME2DIACRITIC['Shadda']} :
                     diacritics_list.append([text[i], text[i+1]+text[i+2]])
-                    i += 1
+                    i += 2
                 elif text[i+1] == NAME2DIACRITIC['Shadda']:
                     diacritics_list.append([text[i], text[i+1]])
                     i += 1
@@ -160,11 +165,12 @@ def extract_diacritics_with_previous_letter(text):
                 diacritics_list.append([text[i], ''])
                 i+=1
         elif text[i] == ' ':
+            sentence += text[i]
             diacritics_list.append([' ', ''])
             i+=1
         else:
             i+=1
-    return diacritics_list
+    return diacritics_list,sentence
 
 
                 
@@ -292,6 +298,9 @@ def merge_tokenized_with_diacritics3(tokenized_sentence, diacritics):
 def clean_text(text):
 
     assert isinstance(text, str)
+    # remove any character that is not arabic letter or diacritic or space or SENTENCE_SEPARATORS
+    text = re.sub('[^' + ''.join(ARABIC_SYMBOLS) + SPACES + SENTENCE_SEPARATORS + ']+', '', text)
+    return text
     # Clean HTML garbage, tatweel, dates.
     return DATETIME_REGEXP.sub('', text.replace('ـ', '').replace('&quot;', ''))
 
@@ -317,24 +326,74 @@ def fix_diacritics_errors(diacritized_text):
         fixed_text += x
     return fixed_text
 
+# def sentence_tokenizer(text,debug = False):
+#     sentences_splits = re.split(SENTENCE_TOKENIZATION_REGEXP, text)
+#     sentences = []
+#     for sentence in sentences_splits:
+#         if sentence is not None:
+#             if sentence.strip(SPACES) != '':
+#                 if len(sentence) >100*1.5:
+#                     sentences.append(sentence)
+#     if debug:
+#         for sentence in sentences:
+#             print("sentence: ",sentence)
+#     return sentences
+
 def sentence_tokenizer(text,debug = False):
-    sentences_splits = re.split(SENTENCE_TOKENIZATION_REGEXP, text)
+    # first split document to sentences on end of sentence characters on
+    sentences_splits =  re.split(r'\n', text)
+    
+    # loop on each sentence
     sentences = []
     for sentence in sentences_splits:
         if sentence is not None:
-            if sentence.strip(SPACES) != '':
-                sentences.append(sentence)
-    if debug:
-        for sentence in sentences:
-            print("sentence: ",sentence)
+            # check if sentence is larger than 600 characters
+            if len(sentence) > 600:
+                # split sentence on ;,،؛.:؟!
+                sentences_splits2 = re.split(SENTENCE_TOKENIZATION_REGEXP, sentence)
+                for sentence2 in sentences_splits2:
+                    if sentence2 is not None:
+                        if sentence2.strip(SPACES) != '':
+                            if len(sentence2) > 20:
+                                sentences.append(sentence2)
+            else:
+                if sentence.strip(SPACES) != '':
+                    if len(sentence) > 20:
+                        sentences.append(sentence)
     return sentences
 
+# def sentence_tokenizer(text,debug = False):
+#     # first split document to sentences on '.' only
+    
+#     # SENTENCE_DOT = re.compile(r'\.\s*')
+    
+#     # SENTENCE_DOT = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.)\s')
+#     sentences_splits = re.split(SENTENCE_DOT, text)
+#     # loop on each sentence
+#     sentences = []
+#     for sentence in sentences_splits:
+#         if sentence is not None:
+#             # check if sentence is larger than 600 characters
+#             if len(sentence) > 600:
+#                 # split sentence on ;,،؛.:؟!
+#                 sentences_splits2 = re.split(SENTENCE_TOKENIZATION_REGEXP, sentence)
+#                 for sentence2 in sentences_splits2:
+#                     if sentence2 is not None:
+#                         if sentence2.strip(SPACES) != '':
+#                             if len(sentence)  >200:
+#                                 sentences.append(sentence)
+#                                 # sentences.append(sentence2)
+#             else:
+#                 if sentence.strip(SPACES) != '':
+#                     if len(sentence)  >200:
+#                         sentences.append(sentence)
+#     return sentences
 
 def tokenize(sentence):
     assert isinstance(sentence, str)
     return list(filter(lambda x: x != '' and x.isprintable(), re.split(WORD_TOKENIZATION_REGEXP, sentence)))
 
-def filter_tokenized_sentence(sentence, min_words=1, min_word_diac_rate=0.8, min_word_diac_ratio=0.5):
+def filter_tokenized_sentence(sentence, min_words=2, min_word_diac_rate=0.8, min_word_diac_ratio=0.5):
     assert isinstance(sentence, list) and all(isinstance(w, str) for w in sentence)
     assert min_words >= 0
     assert min_word_diac_rate >= 0
@@ -395,18 +454,19 @@ def preprocessing_text(text,name,debug = False):
         else:
             sentences.extend(line_sentences)
 
-    filtered_sentences = []
+    filtered_sentences = sentences
     # loop on each sentence
-    for i in range(len(sentences)):
-        # filter sentence
-        possible_sentences = filter_tokenized_sentence(tokenize(fix_diacritics_errors(sentences[i])))
-        if len(possible_sentences) > 0:
-            filtered_sentences.append(' '.join(possible_sentences))
+
+    # for i in range(len(sentences)):
+    #     # filter sentence
+    #     possible_sentences = filter_tokenized_sentence(tokenize(fix_diacritics_errors(sentences[i])))
+    #     if len(possible_sentences) > 0:
+    #         filtered_sentences.append(' '.join(possible_sentences))
 
     # save filtered sentences in text file
     with open("dataset/"+name, 'w', encoding='utf-8') as f:
         for sentence in filtered_sentences:
-            f.write(remove_non_arabic_chars( sentence).strip()+'\n')
+            f.write(remove_non_arabic_chars(sentence).strip()+'\n')
     with open("dataset/undiacritized_"+name, 'w', encoding='utf-8') as f:
         for sentence in filtered_sentences:
             f.write(clear_diacritics(remove_non_arabic_chars (sentence)).strip()+'\n')

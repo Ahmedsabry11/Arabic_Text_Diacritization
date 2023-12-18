@@ -16,12 +16,14 @@ def load_text(file_path):
 
 def extract_labels(sentences):
     labels = []
+    undiacritized_sentences = []
     for sentence in sentences:
         # extract diacritics
-        diacritics = tp.extract_diacritics_with_previous_letter(sentence)
+        diacritics,undiacritized_sentence = tp.extract_diacritics_with_previous_letter(sentence)
         # append diacritics to labels
         labels.append(diacritics)
-    return labels
+        undiacritized_sentences.append(undiacritized_sentence)
+    return labels,undiacritized_sentences
 
 
 def create_tokenized_sentence(file_path,model_file):
@@ -134,6 +136,13 @@ def convert_sentence_to_vector(sentence):
         char_vec = convert_char_to_vector(char)
         sentence_vector.append(char_vec)
     return np.array(sentence_vector)
+
+# print dictionary of DIACRITIC2INDEX
+# print(tp.DIACRITIC2INDEX)
+# print(len(tp.DIACRITIC2INDEX))
+# # print dictionary of CHAR2INDEX
+# print(tp.CHAR2INDEX)
+# print(len(tp.CHAR2INDEX))
 
 # create_tokenized_sentence2("dataset/undiacritized_train_preprocessed.txt","arabic_bpe_tokenizer.json")
 # create_tokenized_sentence("dataset/undiacritized_train_preprocessed.txt","arabic_tokenizer.model")
