@@ -9,8 +9,8 @@ class WordFeatureExtraction():
         self.min_count = min_count
         self.epoches=epoches
         self.alpha=alpha
-        
-    def map_words_to_vectors(input_list, word_vector_dict):
+
+    def map_words_to_vectors(self,input_list, word_vector_dict):
         output = []
         for inner_list in input_list:
             inner_output = {}
@@ -21,6 +21,8 @@ class WordFeatureExtraction():
                 output.append(inner_output)
         return output
 
+    def CBOW_train(self):
+      self.cbow_model = Word2Vec(sentences=self.tokenized_texts, vector_size=self.embedding_dim, window=self.window_size, sg=0, min_count=self.min_count)
+
     def CBOW(self):
-        cbow_model = Word2Vec(sentences=self.tokenized_texts, vector_size=self.embedding_dim, window=self.window_size, sg=0, min_count=self.min_count)
-        return map_words_to_vectors(self.tokenized_texts,cbow_model.wv)
+        return self.map_words_to_vectors(self.tokenized_texts,self.cbow_model.wv)
