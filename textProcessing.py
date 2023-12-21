@@ -48,7 +48,7 @@ SENTENCE_TOKENIZATION_REGEXP = re.compile(r'([' + SENTENCE_SEPARATORS + r'])(?!\
 SENTENCE_DOT = re.compile(r'([.])(?!\w)|' + XML_TAG)
 
 CHAR2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_LETTERS)))
-CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0'], len(CHAR2INDEX))))
+CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0','s'], len(CHAR2INDEX))))
 INDEX2CHAR = dict((v, k) for k, v in CHAR2INDEX.items())
 
 DIACRITIC2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_DIACRITICS)))
@@ -471,6 +471,3 @@ def preprocessing_text(text,name,debug = False):
         for sentence in filtered_sentences:
             f.write(clear_diacritics(remove_non_arabic_chars (sentence)).strip()+'\n')
     return filtered_sentences
-            
-
-    

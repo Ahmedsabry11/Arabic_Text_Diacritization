@@ -110,14 +110,26 @@ def convert_diacritic_to_vector(diacritic):
     vector[index] = 1
     return np.array(vector)
 
+# def convert_labels_to_vector(labels):
+#     # convert each character to vector of 1s and 0s
+#     # get character index from dictionary
+#     labels_vector = []
+#     for label in labels:
+#         label_vec = convert_diacritic_to_vector(label[1])
+#         labels_vector.append(label_vec)
+#     labels_vector = np.array(labels_vector)
+#     # print("labels_vector",labels_vector.shape)
+#     return labels_vector
 def convert_labels_to_vector(labels):
     # convert each character to vector of 1s and 0s
     # get character index from dictionary
     labels_vector = []
     for label in labels:
-        label_vec = convert_diacritic_to_vector(label[1])
+        label_vec = tp.DIACRITIC2INDEX[label[1]]
         labels_vector.append(label_vec)
-    return np.array(labels_vector)
+    labels_vector = np.array(labels_vector)
+    # print("labels_vector",labels_vector.shape)
+    return labels_vector
 
 def convert_tokenized_sentence_to_vector(tokenzied_sentence):
     # convert each character to vector of 1s and 0s
@@ -135,14 +147,16 @@ def convert_sentence_to_vector(sentence):
     for char in sentence:
         char_vec = convert_char_to_vector(char)
         sentence_vector.append(char_vec)
-    return np.array(sentence_vector)
+    sentence_vector =  np.array(sentence_vector)
+    # print("sentence_vector",sentence_vector.shape)
+    return sentence_vector
 
 # print dictionary of DIACRITIC2INDEX
-# print(tp.DIACRITIC2INDEX)
-# print(len(tp.DIACRITIC2INDEX))
-# # print dictionary of CHAR2INDEX
-# print(tp.CHAR2INDEX)
-# print(len(tp.CHAR2INDEX))
+print(tp.DIACRITIC2INDEX)
+print(len(tp.DIACRITIC2INDEX))
+# print dictionary of CHAR2INDEX
+print(tp.CHAR2INDEX)
+print(len(tp.CHAR2INDEX))
 
 # create_tokenized_sentence2("dataset/undiacritized_train_preprocessed.txt","arabic_bpe_tokenizer.json")
 # create_tokenized_sentence("dataset/undiacritized_train_preprocessed.txt","arabic_tokenizer.model")
