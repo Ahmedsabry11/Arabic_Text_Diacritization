@@ -35,14 +35,12 @@ class Embedding_Dataset(Dataset):
           for sentence, labels in batch:
               processed_sentences.append(sentence)
               processed_labels.append(labels)
-          print(processed_sentences[0])
           return processed_sentences, processed_labels
 
     def extract_sentences_word_embedding(self,train_dataloader):
       charEmbeddingVectors=[]
       labels_batches=[]
       for batch_idx, (batch_sentences, batch_labels) in enumerate(train_dataloader):
-          print(batch_sentences[0])
           wordEmbedding=WordFeatureExtraction(batch_sentences)
           wordEmbedding.CBOW_train()
           wordEmbeddingVector=wordEmbedding.CBOW()

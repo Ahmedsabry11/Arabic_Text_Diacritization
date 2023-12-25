@@ -85,7 +85,6 @@ class CharLevelEncoder(nn.Module):
                         for idx, char_idx in enumerate(char_indices):
                             char_embedding_dict[arabic_word_chars[idx]] = combined_reshaped[idx].tolist()
                         sentence_char_list.append(char_embedding_dict)
-                        print(char_embedding_dict,word)
 
                     all_sentence_list.append(sentence_char_list)
 
