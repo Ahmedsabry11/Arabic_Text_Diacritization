@@ -110,27 +110,27 @@ def convert_diacritic_to_vector(diacritic):
     vector[index] = 1
     return np.array(vector)
 
-def convert_labels_to_vector(labels):
-    # convert each character to vector of 1s and 0s
-    # get character index from dictionary
-    labels_vector = []
-    for label in labels:
-        label_vec = convert_diacritic_to_vector(label[1])
-        labels_vector.append(label_vec)
-    labels_vector = np.array(labels_vector)
-    # print("labels_vector",labels_vector.shape)
-    return labels_vector
-
 # def convert_labels_to_vector(labels):
 #     # convert each character to vector of 1s and 0s
 #     # get character index from dictionary
 #     labels_vector = []
 #     for label in labels:
-#         label_vec = tp.DIACRITIC2INDEX[label[1]]
+#         label_vec = convert_diacritic_to_vector(label[1])
 #         labels_vector.append(label_vec)
 #     labels_vector = np.array(labels_vector)
 #     # print("labels_vector",labels_vector.shape)
 #     return labels_vector
+
+def convert_labels_to_vector(labels):
+    # convert each character to vector of 1s and 0s
+    # get character index from dictionary
+    labels_vector = []
+    for label in labels:
+        label_vec = tp.DIACRITIC2INDEX[label[1]]
+        labels_vector.append(label_vec)
+    labels_vector = np.array(labels_vector)
+    # print("labels_vector",labels_vector.shape)
+    return labels_vector
 
 def convert_tokenized_sentence_to_vector(tokenzied_sentence):
     # convert each character to vector of 1s and 0s

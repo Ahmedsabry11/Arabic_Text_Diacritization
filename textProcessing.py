@@ -52,9 +52,9 @@ CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0','s'], len(CHAR2IND
 INDEX2CHAR = dict((v, k) for k, v in CHAR2INDEX.items())
 
 DIACRITIC2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_DIACRITICS)))
-DIACRITIC2INDEX.update(dict((v, k) for k, v in enumerate([''], len(DIACRITIC2INDEX))))
+DIACRITIC2INDEX.update(dict((v, k) for k, v in enumerate(['','0'], len(DIACRITIC2INDEX))))
 INDEX2DIACRITIC = dict((v, k) for k, v in DIACRITIC2INDEX.items())
-
+print("DIACRITIC2INDEX: ",DIACRITIC2INDEX.items())
 
 # print arabic diacritics
 def printDiacritics():
