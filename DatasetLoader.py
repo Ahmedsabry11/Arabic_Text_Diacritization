@@ -4,9 +4,9 @@ from torch.utils.data import Dataset
 from data_preprocessing import DataPreprocessing
 
 class MyDataset(Dataset):
-    def __init__(self,T=300):
+    def __init__(self,dataset_path = "dataset/train_preprocessed.txt",T=280):
         self.dataPreprocessor = DataPreprocessing()
-        self.data = self.dataPreprocessor.load_text("dataset/train_preprocessed.txt")
+        self.data = self.dataPreprocessor.load_text(dataset_path)
         self.T = T
 
     def __len__(self):

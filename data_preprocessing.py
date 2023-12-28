@@ -35,6 +35,13 @@ class DataPreprocessing:
     # YA_REGEXP = re.compile(r'ى(?=['+''.join(ARABIC_DIACRITICS)+r'])')
     DIACRITIC_SHADDA_REGEXP = re.compile('(['+''.join(ARABIC_DIACRITICS)+'])('+NAME2DIACRITIC['Shadda']+')')
 
+    CHAR2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_LETTERS)))
+    CHAR2INDEX.update(dict((v, k) for k, v in enumerate([' ', '0','s'], len(CHAR2INDEX))))
+    INDEX2CHAR = dict((v, k) for k, v in CHAR2INDEX.items())
+
+    DIACRITIC2INDEX = dict((l, n) for n, l in enumerate(sorted(ARABIC_DIACRITICS)))
+    DIACRITIC2INDEX.update(dict((v, k) for k, v in enumerate(['','0'], len(DIACRITIC2INDEX))))
+    INDEX2DIACRITIC = dict((v, k) for k, v in DIACRITIC2INDEX.items())
     def __init__(self):
         pass
     def load_text(self,file_path):
@@ -170,7 +177,7 @@ class DataPreprocessing:
             line = self.clean(line)
 
             # tokenize line to sentences using tokenizer or regex
-            line_sentences = DataPreprocessing.sentence_tokenizer(line)
+            line_sentences = self.sentence_tokenizer(line)
 
             if len(line_sentences) > 1:
                 for i in range(0,len(line_sentences),2):

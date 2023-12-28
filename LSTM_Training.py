@@ -5,12 +5,12 @@ import torch.optim as optim
 import numpy as np
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import Dataset, DataLoader
-from RNN import RNNClassifier
+from LSTM import LSTMClassifier
 from data_preprocessing import DataPreprocessing
 from DatasetLoader import MyDataset
 
-class RNNTrainer:
-    def __init__(self,load = True,input_size = 39,hidden_size = 128,output_size = 16,batch_size = 512,num_epochs = 10):
+class LSTMTrainer:
+    def __init__(self,load=True,epoch = 0,input_size = 39,hidden_size = 128,output_size = 16,batch_size = 512,num_epochs = 20):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
@@ -19,20 +19,25 @@ class RNNTrainer:
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        self.model = RNNClassifier(self.input_size, self.hidden_size, self.output_size)
+        self.model = LSTMClassifier(self.input_size, self.hidden_size, self.output_size)
+        self.current_epoch = 0
+        self.current_epoch = epoch
         if load:
-            self.load_model()
+            self.load_model(epoch)
         self.model.to(self.device)
-        self.train_dataset = MyDataset()
-        self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt")
-        self.train_dataloader = DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+        self.dataset = MyDataset(T = 280)
+        self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt",T = 280)
+        self.train_dataloader = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
         self.test_dataloader = DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=True)
         self.criterion = nn.CrossEntropyLoss(ignore_index=15)
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.001)
-        self.scheduler = StepLR(self.optimizer, step_size=5, gamma=0.5)
+        self.scheduler = StepLR(self.optimizer, step_size=2, gamma=0.5)
+        
 
     def train(self):
-        for epoch in range(self.num_epochs):
+        for epoch in range(0,self.current_epoch):
+            self.scheduler.step()
+        for epoch in range(self.current_epoch,self.num_epochs):
             self.model.train()
             running_loss = 0.0
             for i, data in enumerate(self.train_dataloader, 0):
@@ -52,15 +57,15 @@ class RNNTrainer:
                 self.optimizer.step()
                 # print statistics
                 running_loss += loss.item()
-                
-                if i % 2 == 0:  # print every 2 mini-batches
+                if i % 2 == 0:  # print every 100 mini-batches
                     print('[%d, %5d] loss: %.3f' %
                           (epoch + 1, i + 1, running_loss / 2))
                     running_loss = 0.0
             self.scheduler.step()
             # save the model if it has the best training loss till now
-            self.save_model()
+            self.save_model(epoch+1)
         print('Finished Training')
+
     def test(self):
         self.model.eval()
         with torch.no_grad():
@@ -100,6 +105,8 @@ class RNNTrainer:
                 correct += (predicted == labels).sum().item()
             print('Accuracy of the network on the test set: %d %%' % (
                     100 * correct / total))
+            print('Accuracy of the network on the test set: %f %%' % (
+                    100 * correct / total))
         with torch.no_grad():
             correct = 0
             total = 0
@@ -120,14 +127,18 @@ class RNNTrainer:
                 correct += (predicted == labels).sum().item()
             print('Accuracy of the network on the train set: %d %%' % (
                     100 * correct / total))
-    def save_model(self):
-        torch.save(self.model.state_dict(), "models/rnn_model.pth")
-    def load_model(self):
-        self.model.load_state_dict(torch.load("models/rnn_model.pth"))
+            # print floating point accuracy
+            print('Accuracy of the network on the train set: %f %%' % (
+                    100 * correct / total))
+    def save_model(self,epoch):
+        torch.save(self.model.state_dict(), "models/lstm_model_"+str(epoch)+".pth")
+    def load_model(self,epoch=9):
+        self.model.load_state_dict(torch.load("models/lstm_model_"+str(epoch)+".pth"))
         self.model.eval()
+        self.current_epoch = epoch
 
 
 
 if __name__ == "__main__":
-    rnnTrainer = RNNTrainer()
-    rnnTrainer.train()
+    lstmTrainer = LSTMTrainer()
+    lstmTrainer.train()
