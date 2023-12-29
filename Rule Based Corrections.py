@@ -20,18 +20,15 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print(corrected_string)
             # print("here2")
 
-        if corrected_string[i] == 'ا' and not(i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ') :
-            print('hh')
+        if corrected_string[i] == 'ا' and not(i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' '):
             while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                 i+=1
-                print(corrected_string[i])
             if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
                 while corrected_string[i] not in ARABIC_LETTERS: corrected_string.pop(i)
             # print(corrected_string)
             # print("here3")
 
-        if corrected_string[i] == 'ا':
-            print(corrected_string)
+        if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ':
             while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                 i+=1
             if i+1 < len(corrected_string) and corrected_string[i+1] != ' ':
@@ -91,6 +88,6 @@ def Shadda_Corrections(predicted_diacritized_string):
 
 
 
-predicted_string = 'مَرْحَبًبٌاٌ بِكُمْ'
+predicted_string = 'حُسَنُ الْأَدَبِ'
 corrected_result = primary_diacritics_corrections(predicted_string)
 print(corrected_result)
