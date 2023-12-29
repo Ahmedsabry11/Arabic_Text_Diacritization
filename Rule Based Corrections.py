@@ -21,10 +21,12 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print("here2")
 
         if corrected_string[i] == 'ا' and not(i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ') :
+            print('hh')
             while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                 i+=1
+                print(corrected_string[i])
             if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
-                corrected_string.insert(i+1,'ً')
+                while corrected_string[i] not in ARABIC_LETTERS: corrected_string.pop(i)
             # print(corrected_string)
             # print("here3")
 
@@ -53,6 +55,7 @@ def primary_diacritics_corrections(predicted_diacritized_string):
 
         if (corrected_string[i] in ['ٍ','ٌ'] and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and corrected_string[i+1] != 'ا'):
             corrected_string.pop(i)
+            i-=1
             # print(corrected_string)
             # print("here6")
 
