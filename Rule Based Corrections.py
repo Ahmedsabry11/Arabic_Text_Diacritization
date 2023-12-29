@@ -28,7 +28,7 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print(corrected_string)
             # print("here3")
 
-        if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ':
+        if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ' and i!=0:
             while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                 i+=1
             if i+1 < len(corrected_string) and corrected_string[i+1] != ' ':
@@ -88,6 +88,6 @@ def Shadda_Corrections(predicted_diacritized_string):
 
 
 
-predicted_string = 'حُسَنُ الْأَدَبِ'
+predicted_string = "اختبار الدَوائر"
 corrected_result = primary_diacritics_corrections(predicted_string)
 print(corrected_result)
