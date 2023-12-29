@@ -226,7 +226,13 @@ class DataPreprocessing:
         labels_vector = np.array(labels_vector)
         # print("labels_vector",labels_vector.shape)
         return labels_vector
-
+    def convert_sentence_to_indices(self,sentence):
+        sentence_vector = []
+        for char in sentence:
+            char_vec = DataPreprocessing.CHAR2INDEX[char]
+            sentence_vector.append(char_vec)
+        return sentence_vector
+    
     def convert_tokenized_sentence_to_vector(self,tokenzied_sentence):
         # convert each character to vector of 1s and 0s
         # get character index from dictionary

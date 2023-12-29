@@ -5,12 +5,13 @@ import torch.optim as optim
 import numpy as np
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import Dataset, DataLoader
-from LSTM import LSTMClassifier
+from cbhg import CBHGModel
 from data_preprocessing import DataPreprocessing
-from DatasetLoader import MyDataset
+from cbhg_data_loader import MyDataset
 
-class LSTMTrainer:
-    def __init__(self,load=True,epoch = 0,input_size = 39,hidden_size = 128,output_size = 16,batch_size = 512,num_epochs = 20):
+
+class CBHGTrainer:
+    def __init__(self,load=False,epoch = 0,input_size = 39,hidden_size = 128,output_size = 16,batch_size = 32,num_epochs = 20):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
@@ -18,8 +19,18 @@ class LSTMTrainer:
         self.num_epochs = num_epochs
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-        self.model = LSTMClassifier(self.input_size, self.hidden_size, self.output_size)
+        self.model = CBHGModel( 
+            inp_vocab_size = 39,
+            targ_vocab_size = 16,
+            embedding_dim = 512,
+            use_prenet = True,
+            prenet_sizes = [512, 256],
+            cbhg_gru_units = 512,
+            cbhg_filters = 16,
+            cbhg_projections = [128, 256],
+            post_cbhg_layers_units = [256, 256],
+            post_cbhg_use_batch_norm = True
+        )
         self.current_epoch = 0
         self.current_epoch = epoch
         if load:
@@ -49,6 +60,7 @@ class LSTMTrainer:
                 self.optimizer.zero_grad()
                 # forward + backward + optimize
                 outputs = self.model(inputs)
+                outputs = outputs[]
                 outputs = outputs.view(-1, outputs.shape[-1])
                 labels = labels.view(-1)
                 loss = self.criterion(outputs, labels)
@@ -131,14 +143,14 @@ class LSTMTrainer:
             print('Accuracy of the network on the train set: %f %%' % (
                     100 * correct / total))
     def save_model(self,epoch):
-        torch.save(self.model.state_dict(), "models/lstm_model_"+str(epoch)+".pth")
+        torch.save(self.model.state_dict(), "models/cbhg_model_"+str(epoch)+".pth")
     def load_model(self,epoch=9):
-        self.model.load_state_dict(torch.load("models/lstm_model_"+str(epoch)+".pth"))
+        self.model.load_state_dict(torch.load("models/cbhg_model_"+str(epoch)+".pth"))
         self.model.eval()
         self.current_epoch = epoch
 
 
 
 if __name__ == "__main__":
-    lstmTrainer = LSTMTrainer()
-    lstmTrainer.train()
+    cbhgTrainer = CBHGTrainer()
+    cbhgTrainer.train()
