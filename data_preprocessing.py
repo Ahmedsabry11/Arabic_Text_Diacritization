@@ -226,7 +226,13 @@ class DataPreprocessing:
         labels_vector = np.array(labels_vector)
         # print("labels_vector",labels_vector.shape)
         return labels_vector
-
+    def convert_sentence_to_indices(self,sentence):
+        sentence_vector = []
+        for char in sentence:
+            char_vec = DataPreprocessing.CHAR2INDEX[char]
+            sentence_vector.append(char_vec)
+        return sentence_vector
+    
     def convert_tokenized_sentence_to_vector(self,tokenzied_sentence):
         # convert each character to vector of 1s and 0s
         # get character index from dictionary
@@ -246,6 +252,23 @@ class DataPreprocessing:
         sentence_vector =  np.array(sentence_vector)
         # print("sentence_vector",sentence_vector.shape)
         return sentence_vector
+    def Shadda_Corrections(self,predicted_diacritized_string):
+        forbidden_char = ['0',' ','ا','أ','آ','ى','ئ','ء','إ','ة']
+        corrected_string = list(predicted_diacritized_string)
+        print(corrected_string)
+        i=0
+        while i < len(corrected_string):
+            char = corrected_string[i]
+            if char in forbidden_char or i==0 or corrected_string[i-1]==" ":
+                if i + 1 < len(corrected_string) and corrected_string[i+1] == 'ّ':
+                    corrected_string.pop(i+1)
+                    if i + 2 < len(corrected_string) and corrected_string[i+2] not in DataPreprocessing.ARABIC_LETTERS:
+                        corrected_string.pop(i+1)
+                elif i + 2 < len(corrected_string) and corrected_string[i+2] == 'ّ' and corrected_string[i+1] not in DataPreprocessing.ARABIC_LETTERS:
+                    corrected_string.pop(i+1)
+                    corrected_string.pop(i+1)
+            i += 1
+        return ''.join(corrected_string)
 
     
 

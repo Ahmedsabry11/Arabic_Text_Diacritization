@@ -98,7 +98,7 @@ class LSTMTrainer:
                 outputs = outputs.view(-1, outputs.shape[-1])
                 labels = labels.view(-1)
                 _, predicted = torch.max(outputs.data, 1)
-                      # cut the padding 
+                # cut the padding
                 predicted = predicted[labels != 15]
                 labels = labels[labels != 15]
                 total += labels.size(0)
