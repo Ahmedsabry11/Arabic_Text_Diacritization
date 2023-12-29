@@ -20,19 +20,19 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print(corrected_string)
             # print("here2")
 
-        if corrected_string[i] == 'ا' and not((corrected_string[i+1]==' ') or (corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ')) :
-            while corrected_string[i+1] not in ARABIC_LETTERS:
+        if corrected_string[i] == 'ا' and not(i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ') :
+            while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                 i+=1
-            if corrected_string[i+1] == ' ':
+            if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
                 corrected_string.insert(i+1,'ً')
             # print(corrected_string)
             # print("here3")
 
         if corrected_string[i] == 'ا':
             print(corrected_string)
-            while corrected_string[i+1] not in ARABIC_LETTERS:
+            while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                 i+=1
-            if corrected_string[i+1] != ' ':
+            if i+1 < len(corrected_string) and corrected_string[i+1] != ' ':
                 while corrected_string[i-1] not in ARABIC_LETTERS:
                     corrected_string.pop(i-1)
                 corrected_string.insert(i, 'َ')
@@ -51,7 +51,7 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print(corrected_string)
             # print("here5")
 
-        if corrected_string[i] in ['ً','ٍ','ٌ'] and corrected_string[i+1] != ' ':
+        if (corrected_string[i] in ['ٍ','ٌ'] and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and corrected_string[i+1] != 'ا'):
             corrected_string.pop(i)
             # print(corrected_string)
             # print("here6")
@@ -65,11 +65,6 @@ def primary_diacritics_corrections(predicted_diacritized_string):
     print(corrected_string)
     return ''.join(corrected_string)
     
-
-predicted_string = 'بى بة'
-corrected_result = primary_diacritics_corrections(predicted_string)
-print(corrected_result)
-
 
 def Shadda_Corrections(predicted_diacritized_string):
     forbidden_char = [' ','ا','أ','آ','ى','ئ','ء','إ','ة']
@@ -92,3 +87,7 @@ def Shadda_Corrections(predicted_diacritized_string):
     return ''.join(corrected_string)
 
 
+
+predicted_string = 'مَرْحَبًبٌاٌ بِكُمْ'
+corrected_result = primary_diacritics_corrections(predicted_string)
+print(corrected_result)
