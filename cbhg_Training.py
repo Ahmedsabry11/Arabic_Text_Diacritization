@@ -11,7 +11,7 @@ from cbhg_data_loader import MyDataset
 
 
 class CBHGTrainer:
-    def __init__(self,load=False,epoch = 0,input_size = 39,hidden_size = 128,output_size = 16,batch_size = 32,num_epochs = 20):
+    def __init__(self,load=False,epoch = 0,input_size = 39,hidden_size = 128,output_size = 16,batch_size = 64,num_epochs = 20):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
@@ -60,7 +60,8 @@ class CBHGTrainer:
                 self.optimizer.zero_grad()
                 # forward + backward + optimize
                 outputs = self.model(inputs)
-                outputs = outputs[]
+                outputs = outputs["diacritics"]
+                # print("outputs size: ",outputs.size())
                 outputs = outputs.view(-1, outputs.shape[-1])
                 labels = labels.view(-1)
                 loss = self.criterion(outputs, labels)
@@ -89,6 +90,7 @@ class CBHGTrainer:
                 labels = labels.to(self.device)
                 # forward + backward + optimize
                 outputs = self.model(inputs)
+                outputs = outputs["diacritics"]
                 outputs = outputs.view(-1, outputs.shape[-1])
                 labels = labels.view(-1)
                 loss = self.criterion(outputs, labels)
@@ -107,6 +109,7 @@ class CBHGTrainer:
                 labels = labels.to(self.device)
                 # forward + backward + optimize
                 outputs = self.model(inputs)
+                outputs = outputs["diacritics"]
                 outputs = outputs.view(-1, outputs.shape[-1])
                 labels = labels.view(-1)
                 _, predicted = torch.max(outputs.data, 1)
@@ -129,6 +132,7 @@ class CBHGTrainer:
                 labels = labels.to(self.device)
                 # forward + backward + optimize
                 outputs = self.model(inputs)
+                outputs = outputs["diacritics"]
                 outputs = outputs.view(-1, outputs.shape[-1])
                 labels = labels.view(-1)
                 _, predicted = torch.max(outputs.data, 1)
@@ -152,5 +156,7 @@ class CBHGTrainer:
 
 
 if __name__ == "__main__":
-    cbhgTrainer = CBHGTrainer()
+    cbhgTrainer = CBHGTrainer(epoch=1,load=True)
     cbhgTrainer.train()
+    cbhgTrainer.test()
+    cbhgTrainer.calcluate_accuracy()
