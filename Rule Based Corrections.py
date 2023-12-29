@@ -15,7 +15,7 @@ def primary_diacritics_corrections(predicted_diacritized_string):
         if corrected_string[i] in ['ى','ة']:
             while corrected_string[i-1] not in ARABIC_LETTERS:
                 corrected_string.pop(i-1)
-            corrected_string.insert(i, 'َ')
+            corrected_string.insert(i-1, 'َ')
             i+=1
             # print(corrected_string)
             # print("here2")
@@ -64,6 +64,11 @@ def primary_diacritics_corrections(predicted_diacritized_string):
         i+=1
     print(corrected_string)
     return ''.join(corrected_string)
+    
+
+predicted_string = 'فِي الْمَدْرَسَةِ الصَّغِيرَةِ'
+corrected_result = primary_diacritics_corrections(predicted_string)
+print(corrected_result)
 
 
 def Shadda_Corrections(predicted_diacritized_string):
