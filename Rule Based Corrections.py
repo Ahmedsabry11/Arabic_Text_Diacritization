@@ -39,11 +39,14 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print(corrected_string)
 
         if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ' and i!=0:
-            while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
-                i+=1
-            if i+1 < len(corrected_string) and corrected_string[i+1] != ' ':
-                while corrected_string[i-1] not in ARABIC_LETTERS:
+            j = i
+            while j+1 < len(corrected_string) and corrected_string[j+1] not in ARABIC_LETTERS:
+                j+=1
+            if j+1 < len(corrected_string) and corrected_string[j+1] != ' ':
+                print(corrected_string[i-1])
+                if corrected_string[i-1] not in ARABIC_LETTERS and corrected_string[i-1] != 'ّ': 
                     corrected_string.pop(i-1)
+                    i-=1
                 corrected_string.insert(i, 'َ')
                 i+=1
             # print(corrected_string)
@@ -98,5 +101,6 @@ def Shadda_Corrections(predicted_diacritized_string):
 
 
 
-predicted_string = "أَنَا أُحِبُّ اللَّغَةَ العَرَبِيَّةَ"
+predicted_string = "كِتّابُ جَدِيد"
 corrected_result = primary_diacritics_corrections(predicted_string)
+print(corrected_result[4] == 'َ')
