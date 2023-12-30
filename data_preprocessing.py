@@ -274,7 +274,7 @@ class DataPreprocessing:
         i=0
         while i < len(corrected_string):
             if corrected_string[i] == ' ':
-                while corrected_string[i+1] not in ARABIC_LETTERS:
+                while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                     corrected_string.pop(i+1)
                 
 
@@ -319,7 +319,7 @@ class DataPreprocessing:
                 # print(corrected_string)
                 # print("here4")
             elif i+1 < len(corrected_string) and corrected_string[i] in [' ','ى','آ','ا']:
-                while corrected_string[i+1] not in ARABIC_LETTERS:
+                while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                     corrected_string.pop(i+1)
                 # print(corrected_string)
                 # print("here8")
@@ -330,19 +330,17 @@ class DataPreprocessing:
                 # print(corrected_string)
                 # print("here5")
 
-            if (corrected_string[i] in ['ٍ','ٌ'] and i+1 < len(corrected_string) and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and corrected_string[i+1] != 'ا'):
+            if (corrected_string[i] in ['ٍ','ٌ'] and i+1 < len(corrected_string) and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and i+1 < len(corrected_string) and corrected_string[i+1] != 'ا'):
                 corrected_string.pop(i)
                 i-=1
                 # print(corrected_string)
                 # print("here6")
 
-            if i+1 < len(corrected_string) and corrected_string[i] not in ['ء','ة','ا'] and corrected_string[i+1] == 'ً' and  corrected_string[i+2] == ' ':
+            if i+2 < len(corrected_string) and corrected_string[i] not in ['ء','ة','ا'] and corrected_string[i+1] == 'ً' and  corrected_string[i+2] == ' ':
                 corrected_string.pop(i+1)
                 # print(corrected_string)
                 # print("here7")
-
             i+=1
-
         return ''.join(corrected_string)
         
 
@@ -365,6 +363,7 @@ class DataPreprocessing:
                     corrected_string.pop(i+1)
             i += 1
         return ''.join(corrected_string)
+
 
 
 
