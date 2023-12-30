@@ -61,7 +61,7 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print(corrected_string)
             # print("here5")
 
-        if (corrected_string[i] in ['ٍ','ٌ'] and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and corrected_string[i+1] != 'ا'):
+        if (corrected_string[i] in ['ٍ','ٌ'] and i+1 < len(corrected_string) and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and corrected_string[i+1] != 'ا'):
             corrected_string.pop(i)
             i-=1
             # print(corrected_string)
@@ -99,8 +99,7 @@ def Shadda_Corrections(predicted_diacritized_string):
 
 
 if __name__ == "__main__":
-    predicted_string = "عَلَى طَاوِلَةِ الدِّرَاسَةِ"
+    predicted_string = 'غَيْرُهُ مِنْ رِوَايَةِ البَخْتَرِيِّ بْنِ عُبَيْدٍ وَهُوَ مَتْرُوكٌ وَاخْتَارَ صَاحِبُ المُغْنِي وَالمُحَرَّرِ وَغَيْرِهِمَا لَا يُكْرَهُ'
     print(list(predicted_string))
-    corrected_result = Shadda_Corrections(predicted_string)
+    corrected_result = primary_diacritics_corrections(predicted_string)
     print(list(corrected_result))
-    print(corrected_result[20] == 'َ')
