@@ -243,15 +243,44 @@ class CBHGTrainer:
         index = index[0]
         return index
     def predict(self,sentence):
+        dataPreprocessor = DataPreprocessing()
+        # should clean the sentence
+        sentence = dataPreprocessor.remove_non_arabic_chars(sentence)
+        final_sentence = ""
         self.model.eval()
         with torch.no_grad():
-            inputs = DataPreprocessing.convert_sentence_to_indices(sentence)
+            inputs = dataPreprocessor.convert_sentence_to_indices(sentence)
             inputs = torch.LongTensor(inputs)
+            inputs = inputs.unsqueeze(0)
             inputs = inputs.to(self.device)
             outputs = self.model(inputs)
             outputs = outputs["diacritics"]
             outputs = outputs.view(-1, outputs.shape[-1])
             _, predicted = torch.max(outputs.data, 1)
+
+            # convert to cpu
+            predicted = predicted.cpu()
+            # convert to numpy
+            predicted = predicted.numpy()
+
+            predicted = predicted.reshape(-1)
+
+            # convert to diacritics
+            predicted = dataPreprocessor.convert_label_to_diacritic(predicted)
+
+            # merge the sentence
+            diacritized_sentence = dataPreprocessor.merge_sentence_diacritic(diacritic_vector= predicted,sentence=sentence)
+
+            # apply correction
+            corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
+
+            # call csv writer
+
+            final_sentence = corrected_sentence
+    
+        return final_sentence
+
+                        
 
 
         
@@ -269,4 +298,5 @@ if __name__ == "__main__":
     # cbhgTrainer.train()
     # cbhgTrainer.test()
     # cbhgTrainer.calcluate_accuracy()
-    cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)
+    # cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)
+    print(cbhgTrainer.predict("السلام عليكم ورحمة الله وبركاته"))
