@@ -191,8 +191,13 @@ class CBHGTrainer:
 
                         # extract the label
                         corrected_label,sentence= dataPreprocessor.extract_diacritics_with_previous_letter(corrected_sentence)
+                        
+                        corrected_label = dataPreprocessor.convert_labels_to_indices(corrected_label)
 
                         # calculate accuracy 
+                        # reshape the labels to 1 dim
+                        corrected_label = corrected_label.reshape(-1)
+                        label = label.reshape(-1)
                         correct_after += np.sum(corrected_label == label)
                         total_after += len(corrected_label)
                         
