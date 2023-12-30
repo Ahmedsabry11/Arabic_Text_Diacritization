@@ -41,8 +41,8 @@ class CBHGTrainer:
         self.train_dataloader = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
         self.test_dataloader = DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=True)
         self.criterion = nn.CrossEntropyLoss(ignore_index=15)
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.001)
-        self.scheduler = StepLR(self.optimizer, step_size=2, gamma=0.5)
+        self.optimizer = optim.AdamW(self.model.parameters(), lr=0.0001)
+        self.scheduler = StepLR(self.optimizer, step_size=50, gamma=0.9)
         
 
     def train(self):
@@ -74,7 +74,7 @@ class CBHGTrainer:
                     print('[%d, %5d] loss: %.3f' %
                           (epoch + 1, i + 1, running_loss / 2))
                     running_loss = 0.0
-            self.scheduler.step()
+                self.scheduler.step()
             # save the model if it has the best training loss till now
             self.save_model(epoch+1)
         print('Finished Training')
@@ -156,7 +156,7 @@ class CBHGTrainer:
 
 
 if __name__ == "__main__":
-    cbhgTrainer = CBHGTrainer(epoch=1,load=True)
+    cbhgTrainer = CBHGTrainer(epoch=5,load=True)
     cbhgTrainer.train()
     cbhgTrainer.test()
     cbhgTrainer.calcluate_accuracy()
