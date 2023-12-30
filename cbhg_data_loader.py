@@ -17,7 +17,8 @@ class MyDataset(Dataset):
         sentence = self.data[idx]
         # extract the label
         labels,sentence= self.dataPreprocessor.extract_diacritics_with_previous_letter('s'+sentence)
-
+        # copy  sentence string
+        sentence_copy = sentence
         assert len(sentence) == len(labels)
 
         # check sentence length
@@ -47,5 +48,5 @@ class MyDataset(Dataset):
         sentence = torch.LongTensor(sentence)
         labels = torch.LongTensor(labels)
 
-        return sentence, labels
+        return sentence, labels,sentence_copy
 

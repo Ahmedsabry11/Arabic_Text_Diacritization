@@ -53,7 +53,7 @@ class CBHGTrainer:
             running_loss = 0.0
             for i, data in enumerate(self.train_dataloader, 0):
                 # get the inputs
-                inputs, labels = data
+                inputs, labels,_ = data
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
                 # zero the parameter gradients
@@ -85,7 +85,7 @@ class CBHGTrainer:
             running_loss = 0.0
             for i, data in enumerate(self.test_dataloader, 0):
                 # get the inputs
-                inputs, labels = data
+                inputs, labels,_ = data
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
                 # forward + backward + optimize
@@ -104,7 +104,7 @@ class CBHGTrainer:
             total = 0
             for i, data in enumerate(self.test_dataloader, 0):
                 # get the inputs
-                inputs, labels = data
+                inputs, labels,_ = data
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
                 # forward + backward + optimize
@@ -127,7 +127,7 @@ class CBHGTrainer:
             total = 0
             for i, data in enumerate(self.train_dataloader, 0):
                 # get the inputs
-                inputs, labels = data
+                inputs, labels,_ = data
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
                 # forward + backward + optimize
@@ -146,6 +146,109 @@ class CBHGTrainer:
             # print floating point accuracy
             print('Accuracy of the network on the train set: %f %%' % (
                     100 * correct / total))
+    def calcluate_accuracy_nopadding(self,with_correction=False):
+        self.model.eval()
+        dataPreprocessor = DataPreprocessing()
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            correct_after = 0
+            total_after = 0
+            for i, data in enumerate(self.test_dataloader, 0):
+                # get the inputs
+                inputs, labels,sentences = data
+                inputs = inputs.to(self.device)
+                labels = labels.to(self.device)
+                # forward + backward + optimize
+                outputs = self.model(inputs)
+                outputs = outputs["diacritics"]
+                _, predicted = torch.max(outputs.data, 2)
+                # cut the padding 
+                # loop over the batch
+                for j in range(len(predicted)):
+                    correct_batch,index = self.get_correct(labels[j],predicted[j])
+                    correct += correct_batch
+                    total += index
+                    if with_correction:
+                        index = self.get_padding_index(labels[j])
+                        prediction = predicted[j][:index]
+                        label = labels[j][:index]
+                        # convert to cpu
+                        prediction = prediction.cpu()
+                        label = label.cpu()
+                        # convert to numpy
+                        prediction = prediction.numpy()
+                        label = label.numpy()
+                        prediction = dataPreprocessor.convert_label_to_diacritic(prediction)
+                        
+                        # merge the sentence
+                        sentence = sentences[j]
+                        diacritized_sentence = dataPreprocessor.merge_sentence_diacritic(diacritic_vector= prediction,sentence=sentence)
+
+                        # apply correction
+                        corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
+                        # corrected_sentence = dataPreprocessor.primary_diacritics_corrections(corrected_sentence)
+
+                        # extract the label
+                        corrected_label,sentence= dataPreprocessor.extract_diacritics_with_previous_letter(corrected_sentence)
+
+                        # calculate accuracy 
+                        correct_after += np.sum(corrected_label == label)
+                        total_after += len(corrected_label)
+                        
+
+
+    
+            print('Accuracy of the network on the test set: %d %%' % (
+                    100 * correct / total))
+            # print floating point accuracy
+            print('Accuracy of the network on the test set: %f %%' % (
+                    100 * correct / total))
+            if with_correction:
+                print('Accuracy of the network on the test set after correction: %d %%' % (
+                        100 * correct_after / total_after))
+                # print floating point accuracy
+                print('Accuracy of the network on the test set after correction: %f %%' % (
+                        100 * correct_after / total_after))
+        
+    def get_correct(self,label,prediction):
+        # find index of torch label that has value = 15
+        label = label.view(-1)
+        index = torch.where(label == 15)[0]
+        # check if there is no padding
+        if index.size() == torch.Size([0]):
+            return (prediction == label).sum().item(),label.size(0)
+        # get first index
+        index = index[0]
+        # cut the padding
+        prediction = prediction[:index]
+        label = label[:index]
+        # calculate correct
+        correct = (prediction == label).sum().item()
+        return correct,index+1
+    def get_padding_index(self,label):
+        # find index of torch label that has value = 15
+        label = label.view(-1)
+        index = torch.where(label == 15)[0]
+        # check if there is no padding
+        if index.size() == torch.Size([0]):
+            return -1
+        # get first index
+        index = index[0]
+        return index
+    def predict(self,sentence):
+        self.model.eval()
+        with torch.no_grad():
+            inputs = DataPreprocessing.convert_sentence_to_indices(sentence)
+            inputs = torch.LongTensor(inputs)
+            inputs = inputs.to(self.device)
+            outputs = self.model(inputs)
+            outputs = outputs["diacritics"]
+            outputs = outputs.view(-1, outputs.shape[-1])
+            _, predicted = torch.max(outputs.data, 1)
+
+
+        
     def save_model(self,epoch):
         torch.save(self.model.state_dict(), "models/cbhg_model_"+str(epoch)+".pth")
     def load_model(self,epoch=9):
@@ -156,7 +259,8 @@ class CBHGTrainer:
 
 
 if __name__ == "__main__":
-    cbhgTrainer = CBHGTrainer(epoch=5,load=True)
-    cbhgTrainer.train()
-    cbhgTrainer.test()
-    cbhgTrainer.calcluate_accuracy()
+    cbhgTrainer = CBHGTrainer(epoch=7,load=True)
+    # cbhgTrainer.train()
+    # cbhgTrainer.test()
+    # cbhgTrainer.calcluate_accuracy()
+    cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)

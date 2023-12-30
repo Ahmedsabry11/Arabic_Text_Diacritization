@@ -252,10 +252,98 @@ class DataPreprocessing:
         sentence_vector =  np.array(sentence_vector)
         # print("sentence_vector",sentence_vector.shape)
         return sentence_vector
-    def Shadda_Corrections(self,predicted_diacritized_string):
-        forbidden_char = ['0',' ','ا','أ','آ','ى','ئ','ء','إ','ة']
+    def convert_label_to_diacritic(self,indices):
+        diacritic_vector = []
+        for index in indices:
+            label_vec = DataPreprocessing.INDEX2DIACRITIC[index]
+            diacritic_vector.append(label_vec)
+        diacritic_vector = np.array(diacritic_vector)
+        return diacritic_vector
+    
+    def merge_sentence_diacritic(self,diacritic_vector,sentence):
+        merged_sentence = ''
+        i = 0
+        while i < len(diacritic_vector):
+            merged_sentence += sentence[i]+diacritic_vector[i]
+            i+=1
+        return merged_sentence
+    def primary_diacritics_corrections(self,predicted_diacritized_string):
         corrected_string = list(predicted_diacritized_string)
-        print(corrected_string)
+        i=0
+        while i < len(corrected_string):
+            if corrected_string[i] == ' ':
+                while corrected_string[i+1] not in DataPreprocessing.ARABIC_LETTERS:
+                    corrected_string.pop(i+1)
+                
+
+            if corrected_string[i] == 'إ':
+                while i+1 < len(corrected_string) and corrected_string[i+1] not in DataPreprocessing.ARABIC_LETTERS:
+                    corrected_string.pop(i+1)
+                corrected_string.insert(i+1, 'ِ')
+                # print(corrected_string)
+                # print("here1")
+            
+            if corrected_string[i] in ['ى','ة'] and corrected_string[i-1] != 'َ':
+                # print(corrected_string)
+                while corrected_string[i-1] not in DataPreprocessing.ARABIC_LETTERS:
+                    corrected_string.pop(i-1)
+                    i-=1
+                corrected_string.insert(i, 'َ')
+                i+=1
+                # print(corrected_string)
+                # print("here2")
+
+            if corrected_string[i] == 'ا' and not((i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ')):
+                while i+1 < len(corrected_string) and corrected_string[i+1] not in DataPreprocessing.ARABIC_LETTERS:
+                    # print(corrected_string[i])
+                    i+=1
+                if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
+                    while corrected_string[i] not in DataPreprocessing.ARABIC_LETTERS: 
+                        corrected_string.pop(i)
+                        i-=1
+                # print("here3")
+                # print(corrected_string)
+
+            if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ' and i!=0:
+                while i+1 < len(corrected_string) and corrected_string[i+1] not in DataPreprocessing.ARABIC_LETTERS:
+                    i+=1
+                if i+1 < len(corrected_string) and corrected_string[i+1] != ' ':
+                    while corrected_string[i-1] not in DataPreprocessing.ARABIC_LETTERS:
+                        corrected_string.pop(i-1)
+                    corrected_string.insert(i, 'َ')
+                    i+=1
+                # print(corrected_string)
+                # print("here4")
+            elif i+1 < len(corrected_string) and corrected_string[i] in [' ','ى','آ','ا']:
+                while corrected_string[i+1] not in DataPreprocessing.ARABIC_LETTERS:
+                    corrected_string.pop(i+1)
+                # print(corrected_string)
+                # print("here8")
+
+                
+            if i+1 < len(corrected_string) and corrected_string[i+1] == 'ْ' and (corrected_string[i-1] == ' ' or i==0):
+                corrected_string.pop(i+1)
+                # print(corrected_string)
+                # print("here5")
+
+            if (corrected_string[i] in ['ٍ','ٌ'] and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and corrected_string[i+1] != 'ا'):
+                corrected_string.pop(i)
+                i-=1
+                # print(corrected_string)
+                # print("here6")
+
+            if i+1 < len(corrected_string) and corrected_string[i] not in ['ء','ة','ا'] and corrected_string[i+1] == 'ً' and  corrected_string[i+2] == ' ':
+                corrected_string.pop(i+1)
+                # print(corrected_string)
+                # print("here7")
+
+            i+=1
+        return ''.join(corrected_string)
+        
+
+    def Shadda_Corrections(self,predicted_diacritized_string):
+        forbidden_char = [' ','ا','أ','آ','ى','ئ','ء','إ','ة']
+        corrected_string = list(predicted_diacritized_string)
         i=0
         while i < len(corrected_string):
             char = corrected_string[i]
@@ -264,13 +352,14 @@ class DataPreprocessing:
                     corrected_string.pop(i+1)
                     if i + 2 < len(corrected_string) and corrected_string[i+2] not in DataPreprocessing.ARABIC_LETTERS:
                         corrected_string.pop(i+1)
+
                 elif i + 2 < len(corrected_string) and corrected_string[i+2] == 'ّ' and corrected_string[i+1] not in DataPreprocessing.ARABIC_LETTERS:
                     corrected_string.pop(i+1)
                     corrected_string.pop(i+1)
             i += 1
         return ''.join(corrected_string)
 
-    
+
 
 # # define constants
 # DIACRITIC_NAMES = ['Fathatan', 'Dammatan', 'Kasratan', 'Fatha', 'Damma', 'Kasra', 'Shadda', 'Sukun']
