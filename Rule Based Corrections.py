@@ -2,7 +2,6 @@ def primary_diacritics_corrections(predicted_diacritized_string):
     ARABIC_LETTERS = frozenset([chr(x) for x in (list(range(0x0621, 0x63B)) + list(range(0x0641, 0x064B)))])
     ARABIC_LETTERS = ARABIC_LETTERS.union({' '})
     corrected_string = list(predicted_diacritized_string)
-    print(corrected_string)
     i=0
     while i < len(corrected_string):
         if corrected_string[i] == ' ':
@@ -43,7 +42,6 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             while j+1 < len(corrected_string) and corrected_string[j+1] not in ARABIC_LETTERS:
                 j+=1
             if j+1 < len(corrected_string) and corrected_string[j+1] != ' ':
-                print(corrected_string[i-1])
                 if corrected_string[i-1] not in ARABIC_LETTERS and corrected_string[i-1] != 'ّ': 
                     corrected_string.pop(i-1)
                     i-=1
@@ -75,7 +73,7 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print("here7")
 
         i+=1
-    print(corrected_string)
+
     return ''.join(corrected_string)
     
 
@@ -100,7 +98,9 @@ def Shadda_Corrections(predicted_diacritized_string):
     return ''.join(corrected_string)
 
 
-
-predicted_string = "كِتّابُ جَدِيد"
-corrected_result = primary_diacritics_corrections(predicted_string)
-print(corrected_result[4] == 'َ')
+if __name__ == "__main__":
+    predicted_string = "عَلَى طَاوِلَةِ الدِّرَاسَةِ"
+    print(list(predicted_string))
+    corrected_result = Shadda_Corrections(predicted_string)
+    print(list(corrected_result))
+    print(corrected_result[20] == 'َ')
