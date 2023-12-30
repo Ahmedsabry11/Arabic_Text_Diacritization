@@ -50,7 +50,7 @@ def primary_diacritics_corrections(predicted_diacritized_string):
             # print(corrected_string)
             # print("here4")
         elif i+1 < len(corrected_string) and corrected_string[i] in [' ','ى','آ','ا']:
-            while corrected_string[i+1] not in ARABIC_LETTERS:
+            while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                 corrected_string.pop(i+1)
             # print(corrected_string)
             # print("here8")
