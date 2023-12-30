@@ -88,7 +88,7 @@ class DataPreprocessing:
             fixed_text += x
         return fixed_text
 
-    def extract_diacritics_with_previous_letter(self,text):
+    def extract_diacritics_with_previous_letter(self,text,add_space = True):
         assert isinstance(text, str)
         diacritics_list = []
         i = 0
@@ -116,7 +116,7 @@ class DataPreprocessing:
                 else:
                     diacritics_list.append('')
                     i+=1
-            elif text[i] == ' ':
+            elif text[i] == ' ' and add_space:
                 sentence += text[i]
                 diacritics_list.append('')
                 i+=1
