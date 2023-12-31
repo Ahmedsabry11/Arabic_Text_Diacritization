@@ -3,11 +3,11 @@ import csv
 from data_preprocessing import DataPreprocessing
 
 class OutputFile():
-    def __init__(self) -> None:
+    def __init__(self,test_set_without_labels_file = "sample_test_set_without_labels.csv",test_set_with_labels_file = "test_set_with_golds.csv") -> None:
         self.line_num = 0
         self.diactritic2index = pickle.load(open('diacritic2id.pickle', 'rb'))
-        self.test_set_without_labels_file = "sample_test_set_without_labels.csv"
-        self.test_set_with_labels_file = "test_set_with_golds.csv"
+        self.test_set_without_labels_file = test_set_without_labels_file
+        self.test_set_with_labels_file = test_set_with_labels_file
         self.dataPreprocessor = DataPreprocessing()
         with open(self.test_set_with_labels_file, "w") as fout:
                 # if you need to add any head to the file
