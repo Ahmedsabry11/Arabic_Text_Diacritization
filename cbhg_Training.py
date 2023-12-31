@@ -299,33 +299,6 @@ class CBHGTrainer:
     
         return final_sentence
 
-                        
-
-            # convert to cpu
-            predicted = predicted.cpu()
-            # convert to numpy
-            predicted = predicted.numpy()
-
-            predicted = predicted.reshape(-1)
-
-            # convert to diacritics
-            predicted = dataPreprocessor.convert_label_to_diacritic(predicted)
-
-            # merge the sentence
-            diacritized_sentence = dataPreprocessor.merge_sentence_diacritic(diacritic_vector= predicted,sentence=sentence)
-
-            # apply correction
-            corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
-            # corrected_sentence = dataPreprocessor.primary_diacritics_corrections(corrected_sentence)
-            # call csv writer
-
-            final_sentence = corrected_sentence
-    
-        return final_sentence
-
-                        
-
-
         
     def save_model(self,epoch):
         torch.save(self.model.state_dict(), "models/cbhg_model_"+str(epoch)+".pth")
