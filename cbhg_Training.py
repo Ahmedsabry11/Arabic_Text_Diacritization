@@ -38,9 +38,12 @@ class CBHGTrainer:
         self.model.to(self.device)
         self.dataset = MyDataset(T = 280)
         self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt",T = 600)
+        self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt",T = 600)
         self.train_dataloader = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
         self.test_dataloader = DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=True)
         self.criterion = nn.CrossEntropyLoss(ignore_index=15)
+        self.optimizer = optim.AdamW(self.model.parameters(), lr=0.001)
+        self.scheduler = StepLR(self.optimizer, step_size=2, gamma=0.5)
         self.optimizer = optim.AdamW(self.model.parameters(), lr=0.001)
         self.scheduler = StepLR(self.optimizer, step_size=2, gamma=0.5)
         
@@ -74,6 +77,7 @@ class CBHGTrainer:
                     print('[%d, %5d] loss: %.3f' %
                           (epoch + 1, i + 1, running_loss / 2))
                     running_loss = 0.0
+            self.scheduler.step()
             self.scheduler.step()
             # save the model if it has the best training loss till now
             self.save_model(epoch+1)
@@ -150,6 +154,7 @@ class CBHGTrainer:
         self.model.eval()
         dataPreprocessor = DataPreprocessing()
         total_size = 0
+        total_size = 0
         with torch.no_grad():
             correct = 0
             total = 0
@@ -174,6 +179,8 @@ class CBHGTrainer:
                         index = self.get_padding_index(labels[j])
                         if index == -1:
                             index = len(labels[j])
+                        if index == -1:
+                            index = len(labels[j])
                         prediction = predicted[j][:index]
                         label = labels[j][:index]
                         # convert to cpu
@@ -190,7 +197,7 @@ class CBHGTrainer:
 
                         # apply correction
                         corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
-                        # corrected_sentence = dataPreprocessor.primary_diacritics_corrections(corrected_sentence)
+                        corrected_sentence = dataPreprocessor.primary_diacritics_corrections(corrected_sentence)
 
                         # extract the label
                         corrected_label,sentence= dataPreprocessor.extract_diacritics_with_previous_letter(corrected_sentence)
@@ -199,6 +206,7 @@ class CBHGTrainer:
                         label = label.reshape(-1)
                         correct_after += np.sum(corrected_label == label)
                         total_after += len(corrected_label)
+                        
                         
             print('Accuracy of the network on the test set: %d %%' % (
                     100 * correct / total))
@@ -211,6 +219,11 @@ class CBHGTrainer:
                 # print floating point accuracy
                 print('Accuracy of the network on the test set after correction: %f %%' % (
                         100 * correct_after / total_after))
+                print("total: ",total)
+                print("total_after: ",total_after)
+                print("correct: ",correct)
+                print("correct_after: ",correct_after)
+                assert total == total_after
                 print("total: ",total)
                 print("total_after: ",total_after)
                 print("correct: ",correct)
@@ -229,8 +242,10 @@ class CBHGTrainer:
         prediction = prediction[:index]
         label = label[:index]
 
+
         # calculate correct
         correct = (prediction == label).sum().item()
+        return correct,label.size(0)
         return correct,label.size(0)
     def get_padding_index(self,label):
         # find index of torch label that has value = 15
@@ -243,6 +258,10 @@ class CBHGTrainer:
         index = index[0]
         return index
     def predict(self,sentence):
+        dataPreprocessor = DataPreprocessing()
+        # should clean the sentence
+        sentence = dataPreprocessor.remove_non_arabic_chars(sentence)
+        final_sentence = ""
         dataPreprocessor = DataPreprocessing()
         # should clean the sentence
         sentence = dataPreprocessor.remove_non_arabic_chars(sentence)
@@ -282,6 +301,30 @@ class CBHGTrainer:
 
                         
 
+            # convert to cpu
+            predicted = predicted.cpu()
+            # convert to numpy
+            predicted = predicted.numpy()
+
+            predicted = predicted.reshape(-1)
+
+            # convert to diacritics
+            predicted = dataPreprocessor.convert_label_to_diacritic(predicted)
+
+            # merge the sentence
+            diacritized_sentence = dataPreprocessor.merge_sentence_diacritic(diacritic_vector= predicted,sentence=sentence)
+
+            # apply correction
+            corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
+            # corrected_sentence = dataPreprocessor.primary_diacritics_corrections(corrected_sentence)
+            # call csv writer
+
+            final_sentence = corrected_sentence
+    
+        return final_sentence
+
+                        
+
 
         
     def save_model(self,epoch):
@@ -298,5 +341,5 @@ if __name__ == "__main__":
     # cbhgTrainer.train()
     # cbhgTrainer.test()
     # cbhgTrainer.calcluate_accuracy()
-    # cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)
-    print(cbhgTrainer.predict("السلام عليكم ورحمة الله وبركاته"))
+    cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)
+    # print(cbhgTrainer.predict("السلام عليكم ورحمة الله وبركاته"))
