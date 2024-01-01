@@ -88,6 +88,42 @@ class DataPreprocessing:
             fixed_text += x
         return fixed_text
 
+    def extracT_shadda_first(self,text,add_space = True):
+        assert isinstance(text, str)
+        diacritics_list = []
+        i = 0
+        sentence = ''
+        while i <len(text):
+            # check if the character is a arabic letter
+            if text[i] in DataPreprocessing.ARABIC_LETTERS:
+                # check if next character is diacritic not shadda
+                # add arabic letter to sentence
+                sentence += text[i]
+                if i+1 < len(text):
+                    if text[i+1] in DataPreprocessing.ARABIC_DIACRITICS - {DataPreprocessing.NAME2DIACRITIC['Shadda']}:
+                        diacritics_list.append(text[i+1])
+                        i += 1
+                    elif text[i+1] == DataPreprocessing.NAME2DIACRITIC['Shadda'] and i+2< len(text) and \
+                        text[i+2] in DataPreprocessing.ARABIC_DIACRITICS - {DataPreprocessing.NAME2DIACRITIC['Shadda']} :
+                        diacritics_list.append(text[i+2]+text[i+1])
+                        i += 2
+                    elif text[i+1] == DataPreprocessing.NAME2DIACRITIC['Shadda']:
+                        diacritics_list.append(text[i+1])
+                        i += 1
+                    else:
+                        diacritics_list.append('')
+                    i+=1    
+                else:
+                    diacritics_list.append('')
+                    i+=1
+            elif text[i] == ' ' and add_space:
+                sentence += text[i]
+                diacritics_list.append('')
+                i+=1
+            else:
+                i+=1
+        return diacritics_list,sentence
+    
     def extract_diacritics_with_previous_letter(self,text,add_space = True):
         assert isinstance(text, str)
         diacritics_list = []
@@ -173,12 +209,12 @@ class DataPreprocessing:
                     sentences_splits2 = re.split(DataPreprocessing.SENTENCE_TOKENIZATION_REGEXP, sentence)
                     for sentence2 in sentences_splits2:
                         if sentence2 is not None:
+                            sentence2 = self.remove_non_arabic_chars(sentence2)
                             if sentence2.strip(DataPreprocessing.SPACES) != '':
-                                    sentence2 = self.remove_non_arabic_chars(sentence2)
                                     sentences[i].append(sentence2)
                 else:
+                    sentence = self.remove_non_arabic_chars(sentence)
                     if sentence.strip(DataPreprocessing.SPACES) != '':
-                            sentence = self.remove_non_arabic_chars(sentence)
                             sentences[i].append(sentence)
         return sentences
     def clear_diacritics(self,text: str):

@@ -28,7 +28,7 @@ class OutputFile():
         fieldnames = ['ID', 'label']
         char2id = self.create_mapping_by_line_number(self.line_num)
         # print(len(char2id))
-        labels,_= self.dataPreprocessor.extract_diacritics_with_previous_letter('s'+sentence,False)
+        labels,correct_sentence= self.dataPreprocessor.extract_diacritics_with_previous_letter('s'+sentence,False)
         with open(self.test_set_with_labels_file,"a",newline='') as file:
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             if file.tell() == 0:
@@ -37,6 +37,7 @@ class OutputFile():
                 label_id = self.diactritic2index[labels[i]]
                 new_row_data = {'ID': id, 'label': label_id}
                 writer.writerow(new_row_data)
+                assert correct_sentence[i] == char, "sentence not equal"
         self.line_num += 1
 
 

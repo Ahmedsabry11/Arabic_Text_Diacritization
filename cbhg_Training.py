@@ -289,12 +289,12 @@ class CBHGTrainer:
             diacritized_sentence = dataPreprocessor.merge_sentence_diacritic(diacritic_vector= predicted,sentence=sentence)
 
             # apply correction
-            corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
+            # corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
 
             # call csv writer
             # self.csv_writer.char_with_diacritic_csv(corrected_sentence)
 
-            final_sentence = corrected_sentence
+            final_sentence = diacritized_sentence
             
     
         return final_sentence
