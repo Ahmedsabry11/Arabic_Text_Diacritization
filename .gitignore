@@ -1,2 +1,5 @@
 
-spacyModel/aravec.txt.gz
+spacyModel/
+spacy.aravec.model/
+__pycache__/
+__pycache__/data_preprocessing.cpython-311.pyc
