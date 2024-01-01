@@ -401,10 +401,10 @@ class DataPreprocessing:
             if corrected_string[i] == 'ا':
                 j=i+1
                 while j < len(corrected_string) and corrected_string[j] not in ARABIC_LETTERS: j+=1
-                if corrected_string[j] == 'ل':
+                if j < len(corrected_string) and corrected_string[j] == 'ل':
                     j+=1
                     while j < len(corrected_string) and corrected_string[j] not in ARABIC_LETTERS: j+=1
-                    if corrected_string[j] in ['أ','ب','ج','ح','خ','ع','غ','ف','ق','ك','م','ه','و','ي']:
+                    if j < len(corrected_string) and corrected_string[j] in ['أ','ب','ج','ح','خ','ع','غ','ف','ق','ك','م','ه','و','ي']:
                         j-=1
                         while corrected_string[j] not in ARABIC_LETTERS:
                             corrected_string.pop(j)
