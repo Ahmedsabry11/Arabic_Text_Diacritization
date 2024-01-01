@@ -8,6 +8,7 @@ from torch.utils.data import Dataset, DataLoader
 from cbhg import CBHGModel
 from data_preprocessing import DataPreprocessing
 from cbhg_data_loader import MyDataset
+from output_file import OutputFile
 
 
 class CBHGTrainer:
@@ -41,6 +42,7 @@ class CBHGTrainer:
         self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt",T = 600)
         self.train_dataloader = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
         self.test_dataloader = DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=True)
+        self.csv_writer = OutputFile()
         self.criterion = nn.CrossEntropyLoss(ignore_index=15)
         self.optimizer = optim.AdamW(self.model.parameters(), lr=0.001)
         self.scheduler = StepLR(self.optimizer, step_size=2, gamma=0.5)
@@ -294,6 +296,7 @@ class CBHGTrainer:
             corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
 
             # call csv writer
+            # self.csv_writer.char_with_diacritic_csv(corrected_sentence)
 
             final_sentence = corrected_sentence
     
