@@ -316,16 +316,16 @@ class DataPreprocessing:
                 # print(corrected_string)
                 # print("here2")
 
-            # if corrected_string[i] == 'ا' and not((i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ')):
-            #     while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
-            #         # print(corrected_string[i])
-            #         i+=1
-            #     if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
-            #         while corrected_string[i] not in ARABIC_LETTERS: 
-            #             corrected_string.pop(i)
-            #             i-=1
-            #     # print("here3")
-            #     # print(corrected_string)
+            if corrected_string[i] == 'ا' and not((i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ')):
+                while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
+                    # print(corrected_string[i])
+                    i+=1
+                if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
+                    while corrected_string[i] not in ARABIC_LETTERS: 
+                        corrected_string.pop(i)
+                        i-=1
+                # print("here3")
+                # print(corrected_string)
 
             # if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ' and i!=0 and not(corrected_string[i-1] == 'ِ' and corrected_string[i-2] == 'ب'):
             #     j = i
