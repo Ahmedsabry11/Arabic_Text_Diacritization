@@ -277,6 +277,7 @@ class CBHGTrainer:
             # call csv writer
 
             final_sentence = corrected_sentence
+            
     
         return final_sentence
 
