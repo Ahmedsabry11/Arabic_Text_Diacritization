@@ -10,16 +10,17 @@ from data_preprocessing import DataPreprocessing
 from DatasetLoader import MyDataset
 
 class LSTMTrainer:
-    def __init__(self,load=True,epoch = 0,input_size = 39,hidden_size = 128,output_size = 16,batch_size = 512,num_epochs = 20):
+    def __init__(self,load=True,epoch = 0,input_size = 39,hidden_size = 512,output_size = 16,batch_size = 512,num_epochs = 20,num_embeddings=100):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.batch_size = batch_size
         self.num_epochs = num_epochs
+        self.num_embeddings = num_embeddings
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        self.model = LSTMClassifier(self.input_size, self.hidden_size, self.output_size)
+        self.model = LSTMClassifier(self.num_embeddings, self.hidden_size, self.output_size,self.num_embeddings)
         self.current_epoch = 0
         self.current_epoch = epoch
         if load:
@@ -130,10 +131,49 @@ class LSTMTrainer:
             # print floating point accuracy
             print('Accuracy of the network on the train set: %f %%' % (
                     100 * correct / total))
+            
+    def predict(self,sentence):
+        dataPreprocessor = DataPreprocessing()
+        # should clean the sentence
+        sentence = dataPreprocessor.remove_non_arabic_chars(sentence)
+        final_sentence = ""
+        self.model.eval()
+        with torch.no_grad():
+            inputs = dataPreprocessor.convert_sentence_to_indices(sentence)
+            inputs = torch.LongTensor(inputs)
+            inputs = inputs.unsqueeze(0)
+            inputs = inputs.to(self.device)
+            outputs = self.model(inputs)
+            outputs = outputs.view(-1, outputs.shape[-1])
+            _, predicted = torch.max(outputs.data, 1)
+
+            # convert to cpu
+            predicted = predicted.cpu()
+            # convert to numpy
+            predicted = predicted.numpy()
+
+            predicted = predicted.reshape(-1)
+
+            # convert to diacritics
+            predicted = dataPreprocessor.convert_label_to_diacritic(predicted)
+
+            # merge the sentence
+            diacritized_sentence = dataPreprocessor.merge_sentence_diacritic(diacritic_vector= predicted,sentence=sentence)
+
+            # apply correction
+            corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
+
+            # call csv writer
+            # self.csv_writer.char_with_diacritic_csv(corrected_sentence)
+
+            final_sentence = corrected_sentence
+            
+    
+        return final_sentence
     def save_model(self,epoch):
         torch.save(self.model.state_dict(), "models/lstm_model_"+str(epoch)+".pth")
     def load_model(self,epoch=9):
-        self.model.load_state_dict(torch.load("models/lstm_model_"+str(epoch)+".pth"))
+        self.model.load_state_dict(torch.load("models/lstm512_model_"+str(epoch)+".pth"))
         self.model.eval()
         self.current_epoch = epoch
 

@@ -2,9 +2,9 @@ from cbhg_Training import CBHGTrainer
 from data_preprocessing import DataPreprocessing
 import pickle
 from output_file import OutputFile
+from LSTM_Training import LSTMTrainer
 if __name__ == "__main__":
-
-    cbhgTrainer = CBHGTrainer(epoch=7,load=True)
+    lstmTrainer = LSTMTrainer(epoch=9,load=True)
     # cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)
     # print(cbhgTrainer.predict("السلام عليكم ورحمة الله وبركاته"))
     dataPreprocessor = DataPreprocessing()
@@ -27,8 +27,8 @@ if __name__ == "__main__":
         line_sentences = sentences[i]
         final_sentence = ""
         for sentence in line_sentences:
-            final_sentence += cbhgTrainer.predict(sentence)
-
+            final_sentence += lstmTrainer.predict(sentence)
+            
         csv_writer.char_with_diacritic_csv(final_sentence)
         with open("dataset/test_with_diacritics.txt","a",encoding="utf-8") as file:
             file.write(final_sentence+"\n")
