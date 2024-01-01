@@ -316,14 +316,14 @@ class DataPreprocessing:
                 # print(corrected_string)
                 # print("here2")
 
-            if corrected_string[i] == 'ا' and not((i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ')):
-                while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
-                    # print(corrected_string[i])
-                    i+=1
-                if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
-                    while corrected_string[i] not in ARABIC_LETTERS: 
-                        corrected_string.pop(i)
-                        i-=1
+            # if corrected_string[i] == 'ا' and not((i+1 < len(corrected_string) and corrected_string[i+1]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'َ' and corrected_string[i+2]==' ') or (i+2 < len(corrected_string) and corrected_string[i+1] == 'ً' and corrected_string[i+2]==' ')):
+            #     while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
+            #         # print(corrected_string[i])
+            #         i+=1
+            #     if i+1 < len(corrected_string) and corrected_string[i+1] == ' ':
+            #         while corrected_string[i] not in ARABIC_LETTERS: 
+            #             corrected_string.pop(i)
+            #             i-=1
             #     # print("here3")
             #     # print(corrected_string)
 
@@ -361,6 +361,22 @@ class DataPreprocessing:
             #     corrected_string.pop(i+1)
             #     # print(corrected_string)
             #     # print("here7")
+
+            if corrected_string[i] == 'ا':
+                j=i+1
+                while j < len(corrected_string) and corrected_string[j] not in ARABIC_LETTERS: j+=1
+                if corrected_string[j] == 'ل':
+                    print(j)
+                    j+=1
+                    while j < len(corrected_string) and corrected_string[j] not in ARABIC_LETTERS: j+=1
+                    if corrected_string[j] in ['أ','ب','ج','ح','خ','ع','غ','ف','ق','ك','م','ه','و','ي']:
+                        j-=1
+                        while corrected_string[j] not in ARABIC_LETTERS:
+                            corrected_string.pop(j)
+                            j-=1
+                        corrected_string.insert(j+1,'ْ')
+                        print(j+1)
+
             i+=1
         return ''.join(corrected_string)
         
