@@ -278,20 +278,21 @@ class DataPreprocessing:
                     corrected_string.pop(i+1)
                 
 
-            if corrected_string[i] == 'إ':
+            if corrected_string[i] == 'إ' and corrected_string[i+1] not in ARABIC_LETTERS:
                 while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                     corrected_string.pop(i+1)
                 corrected_string.insert(i+1, 'ِ')
                 # print(corrected_string)
                 # print("here1")
             
-            if corrected_string[i] in ['ى','ة'] and corrected_string[i-1] != 'َ':
-                # print(corrected_string)
-                while corrected_string[i-1] not in ARABIC_LETTERS and corrected_string[i-1] != 'ّ':
-                    corrected_string.pop(i-1)
-                    i-=1
-                corrected_string.insert(i, 'َ')
-                i+=1
+            # if corrected_string[i] in ['ى'] and corrected_string[i-1] != 'َ':
+            #   # print(corrected_string)
+            #   while corrected_string[i-1] not in ARABIC_LETTERS and corrected_string[i-1] != 'ّ':
+            #       corrected_string.pop(i-1)
+            #       i-=1
+            #   if corrected_string[i-1]!='ا' and  corrected_string[i-1]!='ّ': 
+            #       corrected_string.insert(i, 'َ')
+            #       i+=1
                 # print(corrected_string)
                 # print("here2")
 
@@ -303,49 +304,49 @@ class DataPreprocessing:
                     while corrected_string[i] not in ARABIC_LETTERS: 
                         corrected_string.pop(i)
                         i-=1
-                # print("here3")
-                # print(corrected_string)
+            #     # print("here3")
+            #     # print(corrected_string)
 
-            if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ' and i!=0:
-                j = i
-                while j+1 < len(corrected_string) and corrected_string[j+1] not in ARABIC_LETTERS:
-                    j+=1
-                if j+1 < len(corrected_string) and corrected_string[j+1] != ' ':
-                    if corrected_string[i-1] not in ARABIC_LETTERS and corrected_string[i-1] != 'ّ': 
-                        corrected_string.pop(i-1)
-                        i-=1
-                    corrected_string.insert(i, 'َ')
-                    i+=1
-                # print(corrected_string)
-                # print("here4")
-            elif i+1 < len(corrected_string) and corrected_string[i] in [' ','ى','آ','ا']:
+            # if corrected_string[i] == 'ا' and corrected_string[i-1] != ' ' and i!=0 and not(corrected_string[i-1] == 'ِ' and corrected_string[i-2] == 'ب'):
+            #     j = i
+            #     while j+1 < len(corrected_string) and corrected_string[j+1] not in ARABIC_LETTERS:
+            #         j+=1
+            #     if j+1 < len(corrected_string) and corrected_string[j+1] != ' ':
+            #         if corrected_string[i-1] not in ARABIC_LETTERS and corrected_string[i-1] != 'ّ': 
+            #             corrected_string.pop(i-1)
+            #             i-=1
+            #         corrected_string.insert(i, 'َ')
+            #         i+=1
+            #     # print(corrected_string)
+            #     # print("here4")
+            if i+1 < len(corrected_string) and corrected_string[i] in ['آ']:
                 while i+1 < len(corrected_string) and corrected_string[i+1] not in ARABIC_LETTERS:
                     corrected_string.pop(i+1)
                 # print(corrected_string)
                 # print("here8")
 
                 
-            if i+1 < len(corrected_string) and corrected_string[i+1] == 'ْ' and (corrected_string[i-1] == ' ' or i==0):
+            if i+1 < len(corrected_string) and corrected_string[i+1] == 'ْ' and corrected_string[i] !='ب' and(corrected_string[i-1] == ' ' or i==0):
                 corrected_string.pop(i+1)
                 # print(corrected_string)
                 # print("here5")
 
-            if (corrected_string[i] in ['ٍ','ٌ'] and i+1 < len(corrected_string) and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and i+1 < len(corrected_string) and corrected_string[i+1] != 'ا'):
-                corrected_string.pop(i)
-                i-=1
-                # print(corrected_string)
-                # print("here6")
+            # if (corrected_string[i] in ['ٍ','ٌ','ً'] and i+1 < len(corrected_string) and corrected_string[i+1] != ' ') or (corrected_string[i]=='ً' and i+1 < len(corrected_string) and corrected_string[i+1] != 'ا'):
+            #     corrected_string.pop(i)
+            #     i-=1
+            #     # print(corrected_string)
+            #     # print("here6")
 
-            if i+2 < len(corrected_string) and corrected_string[i] not in ['ء','ة','ا'] and corrected_string[i+1] == 'ً' and  corrected_string[i+2] == ' ':
-                corrected_string.pop(i+1)
-                # print(corrected_string)
-                # print("here7")
+            # if i+2 < len(corrected_string) and corrected_string[i] not in ['ء','ة'] and corrected_string[i+1] == 'ً' and  corrected_string[i+2] == ' ':
+            #     corrected_string.pop(i+1)
+            #     # print(corrected_string)
+            #     # print("here7")
             i+=1
         return ''.join(corrected_string)
         
 
     def Shadda_Corrections(self,predicted_diacritized_string):
-        forbidden_char = [' ','ا','أ','آ','ى','ئ','ء','إ','ة']
+        forbidden_char = [' ','ا','أ','آ','ئ','ء','إ','ة']
         ARABIC_LETTERS = frozenset([chr(x) for x in (list(range(0x0621, 0x63B)) + list(range(0x0641, 0x064B)))])
         ARABIC_LETTERS = ARABIC_LETTERS.union({' '})
         corrected_string = list(predicted_diacritized_string)
