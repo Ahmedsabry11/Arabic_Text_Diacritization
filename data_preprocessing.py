@@ -160,7 +160,27 @@ class DataPreprocessing:
                         if len(sentence) > 50:
                             sentences.append(sentence)
         return sentences
-
+    def predict_sentence_tokenizer(self,text,debug = False):
+        
+        # loop on each sentence
+        sentences = {}
+        for i,sentence in enumerate(text):
+            if sentence is not None:
+                sentences[i] = []
+                # check if sentence is larger than 600 characters
+                if len(sentence) > 600:
+                    # split sentence on ;,،؛.:؟!
+                    sentences_splits2 = re.split(DataPreprocessing.SENTENCE_TOKENIZATION_REGEXP, sentence)
+                    for sentence2 in sentences_splits2:
+                        if sentence2 is not None:
+                            if sentence2.strip(DataPreprocessing.SPACES) != '':
+                                    sentence2 = self.remove_non_arabic_chars(sentence2)
+                                    sentences[i].append(sentence2)
+                else:
+                    if sentence.strip(DataPreprocessing.SPACES) != '':
+                            sentence = self.remove_non_arabic_chars(sentence)
+                            sentences[i].append(sentence)
+        return sentences
     def clear_diacritics(self,text: str):
         assert isinstance(text, str)
         return ''.join([l for l in text if l not in DataPreprocessing.ARABIC_DIACRITICS])

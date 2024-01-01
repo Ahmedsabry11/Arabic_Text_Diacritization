@@ -38,11 +38,11 @@ class CBHGTrainer:
             self.load_model(epoch)
         self.model.to(self.device)
         self.dataset = MyDataset(T = 280)
-        self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt",T = 600)
-        self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt",T = 600)
+        # self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed.txt",T = 600)
+        self.test_dataset = MyDataset(dataset_path="dataset/test_preprocessed2.txt",T = 300)
         self.train_dataloader = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
         self.test_dataloader = DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=True)
-        self.csv_writer = OutputFile()
+        self.csv_writer = OutputFile(test_set_without_labels_file="dataset/test_set_without_labels.csv",test_set_with_labels_file="dataset/test_set_gold.csv")
         self.criterion = nn.CrossEntropyLoss(ignore_index=15)
         self.optimizer = optim.AdamW(self.model.parameters(), lr=0.001)
         self.scheduler = StepLR(self.optimizer, step_size=2, gamma=0.5)
@@ -199,7 +199,7 @@ class CBHGTrainer:
 
                         # apply correction
                         corrected_sentence = dataPreprocessor.Shadda_Corrections(diacritized_sentence)
-                        corrected_sentence = dataPreprocessor.primary_diacritics_corrections(corrected_sentence)
+                        # corrected_sentence = dataPreprocessor.primary_diacritics_corrections(corrected_sentence)
 
                         # extract the label
                         corrected_label,sentence= dataPreprocessor.extract_diacritics_with_previous_letter(corrected_sentence)
@@ -264,10 +264,6 @@ class CBHGTrainer:
         # should clean the sentence
         sentence = dataPreprocessor.remove_non_arabic_chars(sentence)
         final_sentence = ""
-        dataPreprocessor = DataPreprocessing()
-        # should clean the sentence
-        sentence = dataPreprocessor.remove_non_arabic_chars(sentence)
-        final_sentence = ""
         self.model.eval()
         with torch.no_grad():
             inputs = dataPreprocessor.convert_sentence_to_indices(sentence)
@@ -313,10 +309,10 @@ class CBHGTrainer:
 
 
 
-if __name__ == "__main__":
-    cbhgTrainer = CBHGTrainer(epoch=7,load=True)
-    # cbhgTrainer.train()
-    # cbhgTrainer.test()
-    # cbhgTrainer.calcluate_accuracy()
-    cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)
-    # print(cbhgTrainer.predict("السلام عليكم ورحمة الله وبركاته"))
+# if __name__ == "__main__":
+#     cbhgTrainer = CBHGTrainer(epoch=7,load=True)
+#     # cbhgTrainer.train()
+#     # cbhgTrainer.test()
+#     # cbhgTrainer.calcluate_accuracy()
+#     cbhgTrainer.calcluate_accuracy_nopadding(with_correction=True)
+#     # print(cbhgTrainer.predict("السلام عليكم ورحمة الله وبركاته"))
