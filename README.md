@@ -109,6 +109,5 @@ python LSTM_Training
 ---
 
 ## 👤 Author
-
-**Your Name**  
+  
 GitHub: [@Ahmedsabry11](https://github.com/Ahmedsabry11)
